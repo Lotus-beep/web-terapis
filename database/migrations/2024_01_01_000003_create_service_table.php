@@ -11,11 +11,15 @@ return new class extends Migration
         Schema::create('service', function (Blueprint $table) {
             $table->id();
             $table->string('name_service');
-            $table->date('date_service');
-            $table->string('status_payment')->default('active');
-            $table->time('time_service');
-            $table->foreignId('id_terapis')->constrained('terapis')->onDelete('cascade');
+            $table->foreignId('id_category')
+                  ->nullable()
+                  ->constrained('service_categories')
+                  ->onDelete('set null');
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->decimal('price', 10, 2);
+            $table->foreignId('id_terapis')->constrained('terapis')->onDelete('cascade');
             $table->foreignId('id_location')->constrained('location')->onDelete('cascade');
             $table->timestamps();
         });

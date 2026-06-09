@@ -1367,7 +1367,7 @@
 
         // Navbar active link highlight on scroll
         const sections = document.querySelectorAll('section[id]');
-        window.addEventListener('scroll', function() {
+        window.addEventList=ener('scroll', function() {
             let scrollY = window.pageYOffset;
             sections.forEach(function(sec) {
                 const top = sec.offsetTop - 80;

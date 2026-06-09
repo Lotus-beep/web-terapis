@@ -12,19 +12,21 @@ class CustomerSeeder extends Seeder
     {
         $customers = [
             [
-                'username' => 'Andi Wijaya',
-                'email' => 'andi@customer.com',
-                'password' => Hash::make('password'),
+                'username'   => 'Andi Wijaya',
+                'email'      => 'andi@customer.com',
+                'password'   => Hash::make('password'),
                 'no_telepon' => '085111111111',
-                'alamat' => 'Jl. Customer No. 1, Jakarta',
+                'alamat'     => 'Jl. Customer No. 1, Jakarta',
+                'gender'     => 'laki-laki',
                 'role_users' => 'customer',
             ],
             [
-                'username' => 'Siti Rahayu',
-                'email' => 'siti@customer.com',
-                'password' => Hash::make('password'),
+                'username'   => 'Siti Rahayu',
+                'email'      => 'siti@customer.com',
+                'password'   => Hash::make('password'),
                 'no_telepon' => '085222222222',
-                'alamat' => 'Jl. Customer No. 2, Bandung',
+                'alamat'     => 'Jl. Customer No. 2, Jakarta',
+                'gender'     => 'perempuan',
                 'role_users' => 'customer',
             ],
         ];

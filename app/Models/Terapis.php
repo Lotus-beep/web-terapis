@@ -19,6 +19,7 @@ class Terapis extends Authenticatable
         'password',
         'no_telepon',
         'alamat',
+        'gender',
         'rating',
     ];
 
@@ -31,7 +32,7 @@ class Terapis extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'rating' => 'decimal:2',
+            'rating'   => 'decimal:2',
         ];
     }
 

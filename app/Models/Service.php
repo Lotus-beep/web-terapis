@@ -15,20 +15,49 @@ class Service extends Model
 
     protected $fillable = [
         'name_service',
-        'date_service',
-        'status_payment',
-        'time_service',
-        'id_terapis',
+        'id_category',
+        'description',
+        'image',
+        'is_active',
         'price',
+        'id_terapis',
         'id_location',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'price'     => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
+
+    // --- Accessors ---
+
+    public function getCategoryLabelAttribute(): string
     {
-        return [
-            'date_service' => 'date',
-            'price' => 'decimal:2',
-        ];
+        return $this->category?->name ?? '-';
+    }
+
+    public function getCategoryIconAttribute(): string
+    {
+        return $this->category?->icon ?? 'bi-heart-pulse-fill';
+    }
+
+    /**
+     * Gambar layanan: pakai upload jika ada,
+     * fallback ke gambar kategori, fallback ke default
+     */
+    public function getCategoryImageAttribute(): string
+    {
+        if ($this->image) {
+            return 'storage/' . $this->image;
+        }
+        return $this->category?->display_image ?? 'image/Bekam Foto.jpeg';
+    }
+
+    // --- Relations ---
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCategory::class, 'id_category');
     }
 
     public function terapis(): BelongsTo
@@ -44,5 +73,24 @@ class Service extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'id_service');
+    }
+
+    // --- Helpers ---
+
+    /**
+     * Cek apakah slot tanggal+jam sudah dipesan
+     */
+    public function isSlotTaken(string $date, string $time, ?int $excludeBookingId = null): bool
+    {
+        $query = $this->bookings()
+            ->where('date_booking', $date)
+            ->where('time_booking', $time)
+            ->whereNotIn('status_service', ['cancelled']);
+
+        if ($excludeBookingId) {
+            $query->where('id', '!=', $excludeBookingId);
+        }
+
+        return $query->exists();
     }
 }

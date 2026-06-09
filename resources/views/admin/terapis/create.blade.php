@@ -17,6 +17,14 @@
                 <input type="text" name="no_telepon" class="form-control" value="{{ old('no_telepon') }}"></div>
             <div class="mb-3"><label class="form-label fw-semibold">Alamat</label>
                 <textarea name="alamat" class="form-control" rows="2">{{ old('alamat') }}</textarea></div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                <select name="gender" class="form-select" required>
+                    <option value="">-- Pilih Gender --</option>
+                    <option value="laki-laki" {{ old('gender')=='laki-laki'?'selected':'' }}>Laki-laki</option>
+                    <option value="perempuan" {{ old('gender')=='perempuan'?'selected':'' }}>Perempuan</option>
+                </select>
+            </div>
             <div class="mb-3"><label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
                 <input type="password" name="password" class="form-control" required></div>
             <div class="mb-4"><label class="form-label fw-semibold">Konfirmasi Password <span class="text-danger">*</span></label>

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             TerapisSeeder::class,
             LocationSeeder::class,
+            ServiceCategorySeeder::class,
             ServiceSeeder::class,
             CustomerSeeder::class,
         ]);

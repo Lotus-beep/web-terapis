@@ -21,6 +21,9 @@ class Booking extends Model
         'status_service',
         'time_booking',
         'payment_proof',
+        'payment_method',
+        'snap_token',
+        'midtrans_order_id',
     ];
 
     protected function casts(): array
@@ -43,5 +46,55 @@ class Booking extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'id_service');
+    }
+
+    public function getStatusPaymentLabelAttribute(): string
+    {
+        return match($this->status_payment) {
+            'unpaid'                => 'Belum Bayar',
+            'pending_snap'          => 'Menunggu Pembayaran',
+            'waiting_confirmation'  => 'Menunggu Konfirmasi',
+            'paid'                  => 'Lunas',
+            'rejected'              => 'Ditolak',
+            'expired'               => 'Kadaluarsa',
+            default                 => $this->status_payment,
+        };
+    }
+
+    public function getStatusServiceLabelAttribute(): string
+    {
+        return match($this->status_service) {
+            'pending'     => 'Menunggu',
+            'confirmed'   => 'Dikonfirmasi',
+            'in_progress' => 'Sedang Berjalan',
+            'completed'   => 'Selesai',
+            'cancelled'   => 'Dibatalkan',
+            default       => $this->status_service,
+        };
+    }
+
+    public function getStatusPaymentBadgeAttribute(): string
+    {
+        return match($this->status_payment) {
+            'paid'                  => 'success',
+            'waiting_confirmation'  => 'warning',
+            'pending_snap'          => 'info',
+            'unpaid'                => 'secondary',
+            'rejected'              => 'danger',
+            'expired'               => 'dark',
+            default                 => 'secondary',
+        };
+    }
+
+    public function getStatusServiceBadgeAttribute(): string
+    {
+        return match($this->status_service) {
+            'confirmed'   => 'success',
+            'in_progress' => 'primary',
+            'completed'   => 'dark',
+            'pending'     => 'warning',
+            'cancelled'   => 'danger',
+            default       => 'secondary',
+        };
     }
 }

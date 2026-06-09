@@ -382,10 +382,14 @@
                     <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                        <input type="password" name="password"
+                        <input type="password" id="loginPwd" name="password"
                             class="form-control @error('password') is-invalid @enderror"
                             placeholder="••••••••"
                             required>
+                        <button type="button" class="btn" id="togglePwd"
+                            style="border:1.5px solid var(--border-soft);border-left:none;border-radius:0 10px 10px 0;background:white;color:var(--text-muted);padding:0 12px;">
+                            <i class="bi bi-eye" id="eyeIcon"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -415,5 +419,18 @@
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('togglePwd').addEventListener('click', function() {
+        const pwd  = document.getElementById('loginPwd');
+        const icon = document.getElementById('eyeIcon');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            pwd.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    });
+</script>
 </body>
 </html>

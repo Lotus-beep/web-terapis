@@ -21,6 +21,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // CRUD Services
     Route::resource('services', App\Http\Controllers\Admin\ServiceController::class);
+
+    // CRUD Service Categories
+    Route::resource('service-categories', App\Http\Controllers\Admin\ServiceCategoryController::class);
     
     // CRUD Locations
     Route::resource('locations', App\Http\Controllers\Admin\LocationController::class);
@@ -34,19 +37,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('comments', [App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');
 });
 
+// Midtrans Webhook (no auth needed)
+Route::post('/midtrans/callback', [App\Http\Controllers\Customer\BookingController::class, 'midtransCallback'])->name('midtrans.callback');
+
+// Midtrans Redirect URLs (dari Midtrans Dashboard — no auth middleware)
+Route::get('/payment/finish', [App\Http\Controllers\Customer\BookingController::class, 'paymentFinish'])->name('payment.finish');
+Route::get('/payment/error',  [App\Http\Controllers\Customer\BookingController::class, 'paymentError'])->name('payment.error');
+
 // Customer Routes
 Route::prefix('customer')->name('customer.')->middleware(['auth', 'customer'])->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('dashboard');
-    
-    // Lihat Services
+
+    // Services
     Route::get('/services', [App\Http\Controllers\Customer\ServiceController::class, 'index'])->name('services.index');
-    
+    Route::get('/services/{service}', [App\Http\Controllers\Customer\ServiceController::class, 'show'])->name('services.show');
+
     // Bookings
     Route::resource('bookings', App\Http\Controllers\Customer\BookingController::class);
     Route::patch('bookings/{booking}/cancel', [App\Http\Controllers\Customer\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('bookings/{booking}/payment', [App\Http\Controllers\Customer\BookingController::class, 'uploadPayment'])->name('bookings.payment');
     Route::post('bookings/{booking}/comment', [App\Http\Controllers\Customer\BookingController::class, 'storeComment'])->name('bookings.comment');
-    
+    Route::get('/bookings/slots', [App\Http\Controllers\Customer\BookingController::class, 'getBookedSlots'])->name('bookings.slots');
+
     // Profile
     Route::get('/profile', [App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profile.update');

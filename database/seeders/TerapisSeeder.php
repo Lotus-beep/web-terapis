@@ -13,41 +13,54 @@ class TerapisSeeder extends Seeder
     {
         $terapisData = [
             [
-                'username' => 'Ahmad Fauzi',
-                'email' => 'ahmad@bekam.com',
-                'password' => Hash::make('password'),
+                'username'   => 'Ahmad Fauzi',
+                'email'      => 'ahmad@bekam.com',
+                'password'   => Hash::make('password'),
                 'no_telepon' => '081111111111',
-                'alamat' => 'Jl. Terapis No. 1, Jakarta',
-                'rating' => 4.50,
+                'alamat'     => 'Jl. Terapis No. 1, Jakarta',
+                'gender'     => 'laki-laki',
+                'rating'     => 4.50,
             ],
             [
-                'username' => 'Budi Santoso',
-                'email' => 'budi@bekam.com',
-                'password' => Hash::make('password'),
+                'username'   => 'Budi Santoso',
+                'email'      => 'budi@bekam.com',
+                'password'   => Hash::make('password'),
                 'no_telepon' => '082222222222',
-                'alamat' => 'Jl. Terapis No. 2, Bandung',
-                'rating' => 4.20,
+                'alamat'     => 'Jl. Terapis No. 2, Bandung',
+                'gender'     => 'laki-laki',
+                'rating'     => 4.20,
             ],
             [
-                'username' => 'Citra Dewi',
-                'email' => 'citra@bekam.com',
-                'password' => Hash::make('password'),
+                'username'   => 'Citra Dewi',
+                'email'      => 'citra@bekam.com',
+                'password'   => Hash::make('password'),
                 'no_telepon' => '083333333333',
-                'alamat' => 'Jl. Terapis No. 3, Surabaya',
-                'rating' => 4.80,
+                'alamat'     => 'Jl. Terapis No. 3, Jakarta',
+                'gender'     => 'perempuan',
+                'rating'     => 4.80,
+            ],
+            [
+                'username'   => 'Dewi Lestari',
+                'email'      => 'dewi@bekam.com',
+                'password'   => Hash::make('password'),
+                'no_telepon' => '084444444444',
+                'alamat'     => 'Jl. Terapis No. 4, Jakarta',
+                'gender'     => 'perempuan',
+                'rating'     => 4.60,
             ],
         ];
 
         foreach ($terapisData as $data) {
             Terapis::create($data);
 
-            // Create corresponding user account with role 'terapis'
+            // Buat user account dengan role terapis
             User::create([
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'password' => $data['password'],
+                'username'   => $data['username'],
+                'email'      => $data['email'],
+                'password'   => $data['password'],
                 'no_telepon' => $data['no_telepon'],
-                'alamat' => $data['alamat'],
+                'alamat'     => $data['alamat'],
+                'gender'     => $data['gender'],
                 'role_users' => 'terapis',
             ]);
         }

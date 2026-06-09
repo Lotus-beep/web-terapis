@@ -35,6 +35,7 @@ class TerapisController extends Controller
             'password'   => 'required|min:8|confirmed',
             'no_telepon' => 'nullable|string|max:20',
             'alamat'     => 'nullable|string|max:500',
+            'gender'     => 'required|in:laki-laki,perempuan',
         ]);
 
         Terapis::create([
@@ -43,6 +44,7 @@ class TerapisController extends Controller
             'password'   => Hash::make($request->password),
             'no_telepon' => $request->no_telepon,
             'alamat'     => $request->alamat,
+            'gender'     => $request->gender,
             'rating'     => 0,
         ]);
 
@@ -52,6 +54,7 @@ class TerapisController extends Controller
             'password'   => Hash::make($request->password),
             'no_telepon' => $request->no_telepon,
             'alamat'     => $request->alamat,
+            'gender'     => $request->gender,
             'role_users' => 'terapis',
         ]);
 
@@ -71,6 +74,7 @@ class TerapisController extends Controller
             'no_telepon' => 'nullable|string|max:20',
             'alamat'     => 'nullable|string|max:500',
             'password'   => 'nullable|min:8|confirmed',
+            'gender'     => 'required|in:laki-laki,perempuan',
         ]);
 
         $data = [
@@ -78,6 +82,7 @@ class TerapisController extends Controller
             'email'      => $request->email,
             'no_telepon' => $request->no_telepon,
             'alamat'     => $request->alamat,
+            'gender'     => $request->gender,
         ];
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);

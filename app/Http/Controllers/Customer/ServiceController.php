@@ -3,29 +3,29 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Location;
 use App\Models\Service;
-use App\Models\Terapis;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Service::with(['terapis', 'location'])
-            ->where('status_payment', 'active');
+        $query = Service::with(['terapis', 'category'])
+            ->where('is_active', true);
 
-        if ($request->id_location) {
-            $query->where('id_location', $request->id_location);
-        }
-        if ($request->id_terapis) {
-            $query->where('id_terapis', $request->id_terapis);
+        if ($request->category) {
+            $query->where('id_category', $request->category);
         }
 
-        $services  = $query->orderBy('date_service', 'asc')->paginate(9);
-        $locations = Location::orderBy('name_location')->get();
-        $terapis   = Terapis::orderBy('username')->get();
+        $services   = $query->orderBy('created_at', 'asc')->paginate(9);
+        $categories = \App\Models\ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('customer.services.index', compact('services', 'locations', 'terapis'));
+        return view('customer.services.index', compact('services', 'categories'));
+    }
+
+    public function show(Service $service)
+    {
+        $service->load(['terapis', 'category']);
+        return view('customer.services.show', compact('service'));
     }
 }

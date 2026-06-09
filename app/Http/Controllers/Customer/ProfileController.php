@@ -24,6 +24,7 @@ class ProfileController extends Controller
             'email'           => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'no_telepon'      => 'nullable|string|max:20',
             'alamat'          => 'nullable|string|max:500',
+            'gender'          => 'nullable|in:laki-laki,perempuan',
             'current_password'=> 'nullable|string',
             'password'        => 'nullable|min:8|confirmed',
         ]);
@@ -39,6 +40,7 @@ class ProfileController extends Controller
             'email'      => $request->email,
             'no_telepon' => $request->no_telepon,
             'alamat'     => $request->alamat,
+            'gender'     => $request->gender,
         ];
 
         if ($request->filled('password')) {

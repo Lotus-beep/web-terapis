@@ -9,14 +9,8 @@ class LocationSeeder extends Seeder
 {
     public function run(): void
     {
-        $locations = [
-            ['name_location' => 'Cabang Utama - Jakarta Pusat'],
-            ['name_location' => 'Cabang Selatan - Jakarta Selatan'],
-            ['name_location' => 'Cabang Timur - Jakarta Timur'],
-        ];
-
-        foreach ($locations as $location) {
-            Location::create($location);
-        }
+        Location::create([
+            'name_location' => 'Rumah Bekam Salam Insani - Rawa Belong',
+        ]);
     }
 }

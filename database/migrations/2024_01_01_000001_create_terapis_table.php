@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('no_telepon')->nullable();
             $table->text('alamat')->nullable();
+            $table->enum('gender', ['laki-laki', 'perempuan'])->nullable();
             $table->decimal('rating', 3, 2)->default(0.00);
             $table->rememberToken();
             $table->timestamps();
