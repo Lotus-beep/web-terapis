@@ -24,12 +24,13 @@ class ServiceCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string|max:500',
-            'icon'        => 'nullable|string|max:100',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'is_active'   => 'nullable|boolean',
-            'sort_order'  => 'nullable|integer|min:0',
+            'name'           => 'required|string|max:100',
+            'header_content' => 'nullable|string|max:200',
+            'description'    => 'nullable|string|max:500',
+            'icon'           => 'nullable|string|max:100',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'is_active'      => 'nullable|boolean',
+            'sort_order'     => 'nullable|integer|min:0',
         ]);
 
         $imagePath = null;
@@ -38,13 +39,14 @@ class ServiceCategoryController extends Controller
         }
 
         ServiceCategory::create([
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
-            'description' => $request->description,
-            'icon'        => $request->icon ?? 'bi-heart-pulse-fill',
-            'image'       => $imagePath,
-            'is_active'   => $request->boolean('is_active', true),
-            'sort_order'  => $request->sort_order ?? 0,
+            'name'           => $request->name,
+            'slug'           => Str::slug($request->name),
+            'header_content' => $request->header_content,
+            'description'    => $request->description,
+            'icon'           => $request->icon ?? 'bi-heart-pulse-fill',
+            'image'          => $imagePath,
+            'is_active'      => $request->boolean('is_active', true),
+            'sort_order'     => $request->sort_order ?? 0,
         ]);
 
         return redirect()->route('admin.service-categories.index')
@@ -59,21 +61,23 @@ class ServiceCategoryController extends Controller
     public function update(Request $request, ServiceCategory $serviceCategory)
     {
         $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string|max:500',
-            'icon'        => 'nullable|string|max:100',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'is_active'   => 'nullable|boolean',
-            'sort_order'  => 'nullable|integer|min:0',
+            'name'           => 'required|string|max:100',
+            'header_content' => 'nullable|string|max:200',
+            'description'    => 'nullable|string|max:500',
+            'icon'           => 'nullable|string|max:100',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'is_active'      => 'nullable|boolean',
+            'sort_order'     => 'nullable|integer|min:0',
         ]);
 
         $data = [
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
-            'description' => $request->description,
-            'icon'        => $request->icon ?? 'bi-heart-pulse-fill',
-            'is_active'   => $request->boolean('is_active', true),
-            'sort_order'  => $request->sort_order ?? 0,
+            'name'           => $request->name,
+            'slug'           => Str::slug($request->name),
+            'header_content' => $request->header_content,
+            'description'    => $request->description,
+            'icon'           => $request->icon ?? 'bi-heart-pulse-fill',
+            'is_active'      => $request->boolean('is_active', true),
+            'sort_order'     => $request->sort_order ?? 0,
         ];
 
         if ($request->hasFile('image')) {

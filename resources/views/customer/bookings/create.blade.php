@@ -23,7 +23,7 @@
                         </div>
                     @endif
 
-                    <!-- Service summary -->
+                    <!-- Service summary — tanpa nama terapis -->
                     <div class="p-3 mb-4" style="background:var(--green-light);border-radius:12px;border:1px solid #b8dfc8;">
                         <div class="d-flex align-items-center gap-3">
                             <img src="{{ asset($service->category_image) }}" alt="{{ $service->name_service }}"
@@ -34,8 +34,10 @@
                                 <div class="fw-bold mt-1" style="color:var(--green-dark);">Rp {{ number_format($service->price, 0, ',', '.') }}</div>
                             </div>
                             <div class="ms-auto text-end">
-                                <div style="font-size:.78rem;color:var(--text-muted);">Terapis</div>
-                                <div class="fw-bold" style="font-size:.875rem;">{{ $service->terapis->username }}</div>
+                                <span style="background:var(--green-light);border:1px solid #b8dfc8;color:var(--green-dark);font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:50px;">
+                                    <i class="bi bi-patch-check-fill me-1"></i>Terapis Bersertifikat
+                                </span>
+                                <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">Terapis akan ditentukan oleh admin</div>
                             </div>
                         </div>
                     </div>

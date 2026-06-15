@@ -14,6 +14,7 @@ class ServiceCategory extends Model
         'name',
         'slug',
         'description',
+        'header_content',
         'icon',
         'image',
         'is_active',

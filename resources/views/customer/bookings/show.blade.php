@@ -35,7 +35,13 @@
                         <tbody>
                             <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Layanan</td><td class="fw-bold">{{ $booking->service->name_service ?? '-' }}</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jenis</td><td>{{ $booking->service->category_label ?? '-' }}</td></tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Terapis</td><td class="fw-bold">{{ $booking->terapis->username ?? '-' }}</td></tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Terapis</td>
+                                <td>
+                                    <span style="background:var(--green-light);color:var(--green-dark);font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:50px;">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Terapis Bersertifikat (ditentukan admin)
+                                    </span>
+                                </td>
+                            </tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Lokasi</td><td>Jl. Daud No.12, Rawa Belong, Jakarta Barat 11540</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Tanggal</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->date_booking)->isoFormat('dddd, D MMMM Y') }}</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jam</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->time_booking)->format('H:i') }} WIB</td></tr>

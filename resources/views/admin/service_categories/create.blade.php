@@ -31,6 +31,18 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">
+                    Judul Layanan <small class="text-muted">(header_content)</small>
+                </label>
+                <input type="text" name="header_content" class="form-control"
+                    value="{{ old('header_content') }}"
+                    placeholder="contoh: Bekam Basah, Fashdu Punggung, Akupuntur Relaksasi">
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">
+                    Judul spesifik yang tampil di halaman layanan, misal: "Bekam Basah Premium".
+                </div>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Deskripsi</label>
                 <textarea name="description" class="form-control" rows="3"
                     placeholder="Jelaskan kategori layanan ini...">{{ old('description') }}</textarea>

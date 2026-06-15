@@ -931,20 +931,31 @@
                 @forelse($services as $service)
                 <div class="col-md-6 col-lg-4 fade-up">
                     <div class="service-card h-100">
-                        <div class="service-card-top">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="fw-bold mb-0" style="font-size:.97rem;">{{ $service->name_service }}</h5>
-                                <span class="price-badge">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
-                            </div>
+                        {{-- Foto Layanan --}}
+                        <div style="overflow:hidden;height:180px;position:relative;">
+                            <img src="{{ asset($service->category_image) }}"
+                                alt="{{ $service->name_service }}"
+                                style="width:100%;height:100%;object-fit:cover;transition:transform .45s;">
+                            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(27,107,58,.55),transparent 55%);"></div>
+                            @if($service->category)
+                                <span style="position:absolute;top:10px;left:10px;background:var(--green-dark);color:white;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:50px;">
+                                    {{ $service->category_label }}
+                                </span>
+                            @endif
+                            <span style="position:absolute;bottom:10px;left:12px;color:white;font-weight:800;font-size:.95rem;text-shadow:0 1px 4px rgba(0,0,0,.4);">
+                                Rp {{ number_format($service->price, 0, ',', '.') }}
+                            </span>
                         </div>
                         <div class="service-card-body">
-                            <div class="service-meta-item"><i class="bi bi-person-badge-fill"></i>{{ $service->terapis->username }}</div>
-                            <div class="service-meta-item"><i class="bi bi-geo-alt-fill"></i>{{ $service->location->name_location }}</div>
-                            <div class="service-meta-item"><i class="bi bi-calendar3"></i>{{ \Carbon\Carbon::parse($service->date_service)->format('d M Y') }}</div>
-                            <div class="service-meta-item"><i class="bi bi-clock-fill"></i>{{ \Carbon\Carbon::parse($service->time_service)->format('H:i') }} WIB</div>
+                            <h5 class="fw-bold mb-2" style="font-size:.97rem;color:var(--text-dark);">{{ $service->name_service }}</h5>
+                            @if($service->description)
+                                <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px;line-height:1.55;">
+                                    {{ Str::limit($service->description, 80) }}
+                                </p>
+                            @endif
                             <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top:1px solid var(--border-soft);">
                                 <span class="fw-bold" style="color:var(--green-dark);font-size:.95rem;">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
-                                <a href="{{ route('register') }}" class="btn btn-booking btn-sm">
+                                <a href="{{ route('register') }}" class="btn-booking btn btn-sm">
                                     <i class="bi bi-calendar-check me-1"></i>Booking
                                 </a>
                             </div>

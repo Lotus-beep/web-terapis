@@ -31,6 +31,15 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Judul Kategori <span class="text-danger">*</span></label>
+                <input type="text" name="header_content" class="form-control"
+                    value="{{ old('name', $serviceCategory->header_content) }}" required>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">
+                    Slug saat ini: <code>{{ $serviceCategory->slug }}</code>
+                </div>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Deskripsi</label>
                 <textarea name="description" class="form-control" rows="3">{{ old('description', $serviceCategory->description) }}</textarea>
             </div>

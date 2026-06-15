@@ -27,19 +27,11 @@ class BookingController extends Controller
     }
 
     /**
-     * Step 1: Choose date & time for a given service
+     * Step 1: Pilih tanggal & jam untuk service tertentu
      */
     public function create(Request $request)
     {
-        $service = Service::with('terapis')->findOrFail($request->service_id);
-
-        // Gender matching: only show service if terapis gender matches customer gender
-        $customer = auth()->user();
-        if ($customer->gender && $service->terapis->gender && $customer->gender !== $service->terapis->gender) {
-            return redirect()->route('customer.services.index')
-                ->with('error', 'Layanan ini hanya tersedia untuk gender ' . $service->terapis->gender . '.');
-        }
-
+        $service = Service::with(['terapis', 'category'])->findOrFail($request->service_id);
         return view('customer.bookings.create', compact('service'));
     }
 
@@ -63,7 +55,7 @@ class BookingController extends Controller
     }
 
     /**
-     * Step 2: Show payment method selection
+     * Step 2: Store booking — terapis di-assign otomatis berdasarkan gender customer
      */
     public function store(Request $request)
     {
@@ -77,19 +69,40 @@ class BookingController extends Controller
         $service  = Service::with('terapis')->findOrFail($request->id_service);
         $customer = auth()->user();
 
-        // Gender check
-        if ($customer->gender && $service->terapis->gender && $customer->gender !== $service->terapis->gender) {
-            return back()->with('error', 'Tidak bisa booking layanan ini karena tidak sesuai gender.');
+        // Auto-assign terapis berdasarkan gender customer
+        // Cari terapis yang gender-nya sama dengan customer dan sedang aktif
+        $assignedTerapis = null;
+
+        if ($customer->gender) {
+            // Cari terapis dengan gender yang sama, pilih yang rating tertinggi
+            $assignedTerapis = Terapis::where('gender', $customer->gender)
+                ->orderBy('rating', 'desc')
+                ->first();
         }
 
-        // Slot lock check
-        if ($service->isSlotTaken($request->date_booking, $request->time_booking)) {
-            return back()->with('error', 'Maaf, jadwal ' . $request->time_booking . ' pada tanggal ' . $request->date_booking . ' sudah dipesan. Silakan pilih waktu lain.');
+        // Fallback: jika tidak ada terapis sesuai gender, pakai terapis dari service
+        if (!$assignedTerapis) {
+            $assignedTerapis = $service->terapis;
+        }
+
+        if (!$assignedTerapis) {
+            return back()->with('error', 'Tidak ada terapis yang tersedia. Silakan hubungi admin.');
+        }
+
+        // Slot lock check — cek berdasarkan terapis yang akan ditugaskan
+        $slotTaken = Booking::where('id_terapis', $assignedTerapis->id)
+            ->where('date_booking', $request->date_booking)
+            ->where('time_booking', $request->time_booking)
+            ->whereNotIn('status_service', ['cancelled'])
+            ->exists();
+
+        if ($slotTaken) {
+            return back()->with('error', 'Maaf, jadwal ' . $request->time_booking . ' pada tanggal ' . $request->date_booking . ' sudah penuh. Silakan pilih waktu lain.');
         }
 
         $booking = Booking::create([
             'id_customer'    => $customer->id,
-            'id_terapis'     => $service->id_terapis,
+            'id_terapis'     => $assignedTerapis->id,
             'id_service'     => $service->id,
             'date_booking'   => $request->date_booking,
             'time_booking'   => $request->time_booking,
