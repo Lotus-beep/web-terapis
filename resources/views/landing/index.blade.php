@@ -933,13 +933,13 @@
                     <div class="service-card h-100">
                         {{-- Foto Layanan --}}
                         <div style="overflow:hidden;height:180px;position:relative;">
-                            <img src="{{ asset($service->category_image) }}"
-                                alt="{{ $service->name_service }}"
+                            <img src="{{ asset($service->display_image) }}"
+                                alt="{{ $service->name }}"
                                 style="width:100%;height:100%;object-fit:cover;transition:transform .45s;">
                             <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(27,107,58,.55),transparent 55%);"></div>
-                            @if($service->category)
+                            @if($service->icon)
                                 <span style="position:absolute;top:10px;left:10px;background:var(--green-dark);color:white;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:50px;">
-                                    {{ $service->category_label }}
+                                    <i class="bi {{ $service->icon }} me-1"></i>{{ $service->name }}
                                 </span>
                             @endif
                             <span style="position:absolute;bottom:10px;left:12px;color:white;font-weight:800;font-size:.95rem;text-shadow:0 1px 4px rgba(0,0,0,.4);">
@@ -947,7 +947,7 @@
                             </span>
                         </div>
                         <div class="service-card-body">
-                            <h5 class="fw-bold mb-2" style="font-size:.97rem;color:var(--text-dark);">{{ $service->name_service }}</h5>
+                            <h5 class="fw-bold mb-2" style="font-size:.97rem;color:var(--text-dark);">{{ $service->header_content ?: $service->name }}</h5>
                             @if($service->description)
                                 <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px;line-height:1.55;">
                                     {{ Str::limit($service->description, 80) }}

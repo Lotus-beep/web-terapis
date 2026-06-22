@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Comment;
-use App\Models\Service;
+use App\Models\Ruangan;
+use App\Models\ServiceCategory;
 use App\Models\Terapis;
+use App\Models\WaktuBoking;
+use App\Models\WaktuLayanan;
 use App\Services\MidtransService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Booking::with(['terapis', 'service'])
+        $query = Booking::with(['terapis', 'service', 'waktuBoking.ruangan'])
             ->where('id_customer', auth()->id());
 
         if ($request->status_service) {
@@ -27,91 +29,207 @@ class BookingController extends Controller
     }
 
     /**
-     * Step 1: Pilih tanggal & jam untuk service tertentu
+     * Step 1: Tampilkan halaman booking — pilih tanggal, slot, ruangan
      */
     public function create(Request $request)
     {
-        $service = Service::with(['terapis', 'category'])->findOrFail($request->service_id);
-        return view('customer.bookings.create', compact('service'));
+        $service = ServiceCategory::where('is_active', true)->findOrFail($request->service_id);
+
+        // Tanggal tersedia: waktu_layanan active dari hari ini ke depan
+        $availableDates = WaktuLayanan::where('active', true)
+            ->where('tanggal', '>=', today())
+            ->orderBy('tanggal')
+            ->get()
+            ->pluck('tanggal')
+            ->map(fn($d) => $d->format('Y-m-d'))
+            ->toArray();
+
+        return view('customer.bookings.create', compact('service', 'availableDates'));
     }
 
     /**
-     * AJAX: Get booked slots for a service on a date
+     * AJAX: Ambil slot waktu untuk tanggal tertentu
+     * GET /customer/bookings/slots?service_id=&date=
      */
     public function getBookedSlots(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:service,id',
+            'service_id' => 'required|exists:service_categories,id',
             'date'       => 'required|date',
         ]);
 
-        $bookedSlots = Booking::where('id_service', $request->service_id)
-            ->where('date_booking', $request->date)
-            ->whereNotIn('status_service', ['cancelled'])
-            ->pluck('time_booking')
-            ->toArray();
+        $waktuLayanan = WaktuLayanan::where('tanggal', $request->date)
+            ->where('active', true)
+            ->first();
 
-        return response()->json(['booked_slots' => $bookedSlots]);
+        if (!$waktuLayanan) {
+            return response()->json(['slots' => [], 'message' => 'Tidak ada jadwal pada tanggal ini.']);
+        }
+
+        // Ambil gender pasien untuk filter ruangan
+        $customer = auth()->user();
+        $genderPasien = $request->booking_for === 'other'
+            ? $request->gender_second
+            : $customer->gender;
+
+        // Ambil semua slot (waktu_boking) untuk tanggal ini
+        $slots = WaktuBoking::with(['ruangan'])
+            ->where('id_waktu_layanan', $waktuLayanan->id)
+            ->where('active', true)
+            ->get()
+            ->groupBy('kode_waktu_boking') // group by jam
+            ->map(function ($slotGroup, $jam) use ($genderPasien) {
+                // Filter ruangan sesuai gender
+                $ruanganAvailable = $slotGroup->filter(function ($slot) use ($genderPasien) {
+                    $r = $slot->ruangan;
+                    if (!$r || !$r->active) return false;
+                    if ($r->gender === 'campur') return true;
+                    return $r->gender === $genderPasien;
+                });
+
+                $totalKursi  = $ruanganAvailable->sum(fn($s) => $s->ruangan->maximal ?? 0);
+                $booked      = $ruanganAvailable->sum(fn($s) =>
+                    $s->bookings()->whereNotIn('status_service', ['cancelled'])->count()
+                );
+                $sisa = max(0, $totalKursi - $booked);
+
+                return [
+                    'jam'        => $jam,
+                    'total'      => $totalKursi,
+                    'booked'     => $booked,
+                    'sisa'       => $sisa,
+                    'is_full'    => $sisa === 0,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'date'   => $request->date,
+            'slots'  => $slots,
+            'buka'   => $waktuLayanan->waktu_buka,
+            'tutup'  => $waktuLayanan->waktu_tutup,
+        ]);
     }
 
     /**
-     * Step 2: Store booking — terapis di-assign otomatis berdasarkan gender customer
+     * AJAX: Ambil daftar ruangan untuk jam + tanggal tertentu
+     * GET /customer/bookings/ruangan?date=&jam=&gender=
+     */
+    public function getRuangan(Request $request)
+    {
+        $request->validate([
+            'date'   => 'required|date',
+            'jam'    => 'required|string',
+            'gender' => 'nullable|string',
+        ]);
+
+        $waktuLayanan = WaktuLayanan::where('tanggal', $request->date)
+            ->where('active', true)
+            ->first();
+
+        if (!$waktuLayanan) {
+            return response()->json(['ruangan' => []]);
+        }
+
+        $gender = $request->gender ?: auth()->user()->gender;
+
+        $slots = WaktuBoking::with(['ruangan'])
+            ->where('id_waktu_layanan', $waktuLayanan->id)
+            ->where('kode_waktu_boking', $request->jam)
+            ->where('active', true)
+            ->get()
+            ->filter(function ($slot) use ($gender) {
+                $r = $slot->ruangan;
+                if (!$r || !$r->active) return false;
+                if ($r->gender === 'campur') return true;
+                return $r->gender === $gender;
+            })
+            ->map(function ($slot) {
+                $booked = $slot->bookings()
+                    ->whereNotIn('status_service', ['cancelled'])
+                    ->count();
+                $sisa = max(0, $slot->ruangan->maximal - $booked);
+
+                return [
+                    'id_waktu_boking' => $slot->id,
+                    'id_ruangan'      => $slot->ruangan->id,
+                    'nama_ruangan'    => $slot->ruangan->nama_ruangan,
+                    'gender'          => $slot->ruangan->gender,
+                    'gender_label'    => $slot->ruangan->gender_label,
+                    'maximal'         => $slot->ruangan->maximal,
+                    'booked'          => $booked,
+                    'sisa'            => $sisa,
+                    'is_full'         => $sisa === 0,
+                ];
+            })
+            ->values();
+
+        return response()->json(['ruangan' => $slots]);
+    }
+
+    /**
+     * Store booking baru
      */
     public function store(Request $request)
     {
         $request->validate([
-            'id_service'      => 'required|exists:service,id',
-            'date_booking'    => 'required|date|after_or_equal:today',
-            'time_booking'    => 'required',
-            'payment_method'  => 'required|in:online,cash',
+            'id_service'       => 'required|exists:service_categories,id',
+            'id_waktu_boking'  => 'required|exists:waktu_boking,id',
+            'id_ruangan'       => 'required|exists:ruangan,id',
+            'payment_method'   => 'required|in:online,cash',
+            'booking_for'      => 'required|in:self,other',
+            'second_username'  => 'required_if:booking_for,other|nullable|string|max:100',
+            'gender_second'    => 'required_if:booking_for,other|nullable|in:laki-laki,perempuan',
         ]);
 
-        $service  = Service::with('terapis')->findOrFail($request->id_service);
-        $customer = auth()->user();
+        $service     = ServiceCategory::findOrFail($request->id_service);
+        $customer    = auth()->user();
+        $waktuBoking = WaktuBoking::with(['waktuLayanan', 'ruangan'])->findOrFail($request->id_waktu_boking);
+        $ruangan     = Ruangan::findOrFail($request->id_ruangan);
 
-        // Auto-assign terapis berdasarkan gender customer
-        // Cari terapis yang gender-nya sama dengan customer dan sedang aktif
-        $assignedTerapis = null;
-
-        if ($customer->gender) {
-            // Cari terapis dengan gender yang sama, pilih yang rating tertinggi
-            $assignedTerapis = Terapis::where('gender', $customer->gender)
-                ->orderBy('rating', 'desc')
-                ->first();
+        // Validasi ruangan milik slot yang dipilih
+        if ($waktuBoking->id_ruangan != $ruangan->id) {
+            return back()->with('error', 'Ruangan tidak sesuai dengan slot yang dipilih.');
         }
 
-        // Fallback: jika tidak ada terapis sesuai gender, pakai terapis dari service
-        if (!$assignedTerapis) {
-            $assignedTerapis = $service->terapis;
-        }
-
-        if (!$assignedTerapis) {
-            return back()->with('error', 'Tidak ada terapis yang tersedia. Silakan hubungi admin.');
-        }
-
-        // Slot lock check — cek berdasarkan terapis yang akan ditugaskan
-        $slotTaken = Booking::where('id_terapis', $assignedTerapis->id)
-            ->where('date_booking', $request->date_booking)
-            ->where('time_booking', $request->time_booking)
+        // Cek kapasitas ruangan untuk slot ini
+        $booked = Booking::where('id_waktu_boking', $waktuBoking->id)
+            ->where('id_ruangan', $ruangan->id)
             ->whereNotIn('status_service', ['cancelled'])
-            ->exists();
+            ->count();
 
-        if ($slotTaken) {
-            return back()->with('error', 'Maaf, jadwal ' . $request->time_booking . ' pada tanggal ' . $request->date_booking . ' sudah penuh. Silakan pilih waktu lain.');
+        if ($booked >= $ruangan->maximal) {
+            return back()->with('error', 'Maaf, ruangan ' . $ruangan->nama_ruangan . ' sudah penuh untuk slot ini.');
         }
+
+        // Validasi gender ruangan
+        $genderPasien = $request->booking_for === 'other'
+            ? $request->gender_second
+            : $customer->gender;
+
+        if ($ruangan->gender !== 'campur' && $ruangan->gender !== $genderPasien) {
+            return back()->with('error', 'Ruangan ini tidak sesuai dengan jenis kelamin pasien.');
+        }
+
+        $tanggal    = $waktuBoking->waktuLayanan->tanggal->format('Y-m-d');
+        $jamBooking = $waktuBoking->kode_waktu_boking;
 
         $booking = Booking::create([
-            'id_customer'    => $customer->id,
-            'id_terapis'     => $assignedTerapis->id,
-            'id_service'     => $service->id,
-            'date_booking'   => $request->date_booking,
-            'time_booking'   => $request->time_booking,
-            'payment_method' => $request->payment_method,
-            'status_payment' => 'unpaid',
-            'status_service' => 'pending',
+            'id_customer'     => $customer->id,
+            'id_terapis'      => null,
+            'id_service'      => $service->id,
+            'id_waktu_boking' => $waktuBoking->id,
+            'id_ruangan'      => $ruangan->id,
+            'date_booking'    => $tanggal,
+            'time_booking'    => $jamBooking,
+            'payment_method'  => $request->payment_method,
+            'status_payment'  => 'unpaid',
+            'status_service'  => 'pending',
+            'booking_for'     => $request->booking_for,
+            'second_username' => $request->booking_for === 'other' ? $request->second_username : null,
+            'gender_second'   => $request->booking_for === 'other' ? $request->gender_second : null,
         ]);
 
-        // If online payment → create snap token
         if ($request->payment_method === 'online') {
             try {
                 $midtrans  = new MidtransService();
@@ -121,19 +239,17 @@ class BookingController extends Controller
                     ->with('snap_token', $snapToken)
                     ->with('snap_url', config('midtrans.snap_url'));
             } catch (\RuntimeException $e) {
-                // Midtrans SDK belum terinstall
                 $booking->update(['payment_method' => 'cash']);
                 return redirect()->route('customer.bookings.show', $booking->id)
-                    ->with('error', 'Pembayaran online belum tersedia. Silakan gunakan metode Cash. (' . $e->getMessage() . ')');
+                    ->with('error', 'Pembayaran online belum tersedia. (' . $e->getMessage() . ')');
             } catch (\Exception $e) {
                 $booking->delete();
-                return back()->with('error', 'Gagal membuat transaksi pembayaran: ' . $e->getMessage());
+                return back()->with('error', 'Gagal membuat transaksi: ' . $e->getMessage());
             }
         }
 
-        // Cash: go to booking detail with upload instruction
         return redirect()->route('customer.bookings.show', $booking->id)
-            ->with('success', 'Booking berhasil! Silakan lakukan pembayaran cash saat sesi berlangsung.');
+            ->with('success', 'Booking berhasil! Silakan lakukan pembayaran.');
     }
 
     public function show(Booking $booking)
@@ -142,11 +258,10 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $booking->load(['terapis', 'service']);
+        $booking->load(['terapis', 'service', 'waktuBoking.ruangan', 'location']);
         $hasComment = Comment::where('id_customer', auth()->id())
             ->where('id_terapis', $booking->id_terapis)->exists();
 
-        // Re-fetch snap token from session if redirected from store
         $snapToken = session('snap_token');
         $clientKey = session('client_key', config('midtrans.client_key'));
         $snapUrl   = session('snap_url', config('midtrans.snap_url'));
@@ -166,9 +281,6 @@ class BookingController extends Controller
         return back()->with('success', 'Booking berhasil dibatalkan.');
     }
 
-    /**
-     * Upload bukti pembayaran cash
-     */
     public function uploadPayment(Request $request, Booking $booking)
     {
         if ($booking->id_customer !== auth()->id()) {
@@ -185,9 +297,6 @@ class BookingController extends Controller
         return back()->with('success', 'Bukti pembayaran berhasil diupload. Menunggu konfirmasi admin.');
     }
 
-    /**
-     * Midtrans webhook callback (dipanggil server Midtrans via POST)
-     */
     public function midtransCallback(Request $request)
     {
         try {
@@ -196,47 +305,30 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             \Log::error('Midtrans webhook error: ' . $e->getMessage());
         }
-
         return response()->json(['status' => 'ok']);
     }
 
-    /**
-     * Finish redirect — Midtrans redirect ke /payment/finish setelah user bayar
-     * Midtrans kirim query string: order_id, status_code, transaction_status
-     */
     public function paymentFinish(Request $request)
     {
         $orderId = $request->query('order_id');
-
         if (!$orderId) {
-            return redirect()->route('customer.bookings.index')
-                ->with('error', 'Data pembayaran tidak ditemukan.');
+            return redirect()->route('customer.bookings.index')->with('error', 'Data pembayaran tidak ditemukan.');
         }
 
         $booking = Booking::where('midtrans_order_id', $orderId)
             ->when(auth()->check(), fn($q) => $q->where('id_customer', auth()->id()))
-            ->first();
+            ->first() ?? Booking::where('midtrans_order_id', $orderId)->first();
 
         if (!$booking) {
-            $booking = Booking::where('midtrans_order_id', $orderId)->first();
-            if (!$booking) {
-                return redirect()->route('login')
-                    ->with('error', 'Booking tidak ditemukan. Silakan login untuk melihat status pembayaran.');
-            }
+            return redirect()->route('login')->with('error', 'Booking tidak ditemukan.');
         }
 
-        // Cek status terbaru ke Midtrans API jika masih pending
         if (in_array($booking->status_payment, ['pending_snap', 'unpaid'])) {
             try {
                 $midtrans = new MidtransService();
                 $status   = $midtrans->checkTransactionStatus($orderId);
-
                 if ($status) {
-                    $midtrans->processStatus(
-                        $booking,
-                        $status['transaction_status'] ?? '',
-                        $status['fraud_status']       ?? ''
-                    );
+                    $midtrans->processStatus($booking, $status['transaction_status'] ?? '', $status['fraud_status'] ?? '');
                     $booking->refresh();
                 }
             } catch (\Exception $e) {
@@ -245,55 +337,37 @@ class BookingController extends Controller
         }
 
         $message = match($booking->status_payment) {
-            'paid'         => 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.',
+            'paid'          => 'Pembayaran berhasil! Booking dikonfirmasi.',
             'pending_snap',
-            'unpaid'       => 'Pembayaran sedang diproses. Halaman akan diperbarui otomatis.',
-            'expired'      => 'Sesi pembayaran telah kadaluarsa.',
-            'rejected'     => 'Pembayaran ditolak atau gagal.',
-            default        => 'Status pembayaran diperbarui.',
+            'unpaid'        => 'Pembayaran sedang diproses.',
+            'expired'       => 'Sesi pembayaran telah kadaluarsa.',
+            'rejected'      => 'Pembayaran ditolak atau gagal.',
+            default         => 'Status pembayaran diperbarui.',
         };
 
         $type = $booking->status_payment === 'paid' ? 'success' : 'error';
-
-        return redirect()->route('customer.bookings.show', $booking->id)
-            ->with($type, $message);
+        return redirect()->route('customer.bookings.show', $booking->id)->with($type, $message);
     }
 
-    /**
-     * Error redirect — Midtrans redirect ke /payment/error saat gagal
-     */
     public function paymentError(Request $request)
     {
         $orderId = $request->query('order_id');
+        $booking = $orderId ? Booking::where('midtrans_order_id', $orderId)->first() : null;
 
-        $booking = $orderId
-            ? Booking::where('midtrans_order_id', $orderId)->first()
-            : null;
-
-        if ($booking) {
-            // Update status ke rejected jika belum
-            if (in_array($booking->status_payment, ['pending_snap', 'unpaid'])) {
-                $booking->update([
-                    'status_payment' => 'rejected',
-                    'status_service' => 'cancelled',
-                ]);
-            }
-
+        if ($booking && in_array($booking->status_payment, ['pending_snap', 'unpaid'])) {
+            $booking->update(['status_payment' => 'rejected', 'status_service' => 'cancelled']);
             return redirect()->route('customer.bookings.show', $booking->id)
-                ->with('error', 'Pembayaran gagal atau dibatalkan. Silakan buat booking baru jika ingin mencoba lagi.');
+                ->with('error', 'Pembayaran gagal atau dibatalkan.');
         }
 
-        return redirect()->route('customer.bookings.index')
-            ->with('error', 'Pembayaran gagal. Silakan coba kembali.');
+        return redirect()->route('customer.bookings.index')->with('error', 'Pembayaran gagal.');
     }
 
     public function storeComment(Request $request, Booking $booking)
     {
-        if ($booking->id_customer !== auth()->id()) {
-            abort(403);
-        }
+        if ($booking->id_customer !== auth()->id()) abort(403);
         if ($booking->status_service !== 'completed') {
-            return back()->with('error', 'Komentar hanya bisa diberikan untuk booking yang sudah selesai.');
+            return back()->with('error', 'Komentar hanya bisa untuk booking yang sudah selesai.');
         }
 
         $request->validate([

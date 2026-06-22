@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('image')->nullable();  // Foto representasi kategori
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0); // Urutan tampil
+            $table->decimal('price', 10, 2)->default(0.00);
             $table->timestamps();
         });
     }

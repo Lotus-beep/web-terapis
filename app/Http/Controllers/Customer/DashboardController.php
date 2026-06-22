@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $completedBooking = Booking::where('id_customer', $customerId)
             ->where('status_service', 'completed')->count();
 
-        $recentBookings = Booking::with(['terapis', 'service.location'])
+        $recentBookings = Booking::with(['terapis', 'service'])
             ->where('id_customer', $customerId)
             ->orderBy('created_at', 'desc')
             ->take(5)

@@ -33,18 +33,67 @@
                 <div class="card-body p-0">
                     <table class="table mb-0" style="font-size:.875rem;">
                         <tbody>
-                            <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Layanan</td><td class="fw-bold">{{ $booking->service->name_service ?? '-' }}</td></tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jenis</td><td>{{ $booking->service->category_label ?? '-' }}</td></tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Terapis</td>
+                            <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Layanan</td><td class="fw-bold">{{ $booking->service->name ?? '-' }}</td></tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jenis</td><td>{{ $booking->service->header_content ?? $booking->service->name ?? '-' }}</td></tr>
+                            <tr>
+                                <td class="fw-600 text-muted ps-4" style="font-weight:600;">Pasien</td>
                                 <td>
-                                    <span style="background:var(--green-light);color:var(--green-dark);font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:50px;">
-                                        <i class="bi bi-patch-check-fill me-1"></i>Terapis Bersertifikat (ditentukan admin)
-                                    </span>
+                                    @if($booking->booking_for === 'other' && $booking->second_username)
+                                        <span class="fw-bold">{{ $booking->second_username }}</span>
+                                        <span style="font-size:.75rem;background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:2px 8px;border-radius:50px;margin-left:6px;">
+                                            <i class="bi bi-people-fill me-1"></i>Titipan
+                                        </span>
+                                        @if($booking->gender_second)
+                                            <div style="font-size:.78rem;color:var(--text-muted);margin-top:2px;">
+                                                {{ $booking->gender_second === 'laki-laki' ? '♂ Laki-laki' : '♀ Perempuan' }}
+                                            </div>
+                                        @endif
+                                    @else
+                                        <span class="fw-bold">{{ $booking->customer->username ?? '-' }}</span>
+                                        <span style="font-size:.75rem;background:var(--green-light);border:1px solid #b8dfc8;color:var(--green-dark);padding:2px 8px;border-radius:50px;margin-left:6px;">
+                                            <i class="bi bi-person-fill me-1"></i>Untuk Saya
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Lokasi</td><td>Jl. Daud No.12, Rawa Belong, Jakarta Barat 11540</td></tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Terapis</td>
+                                <td>
+                                    @if($booking->terapis)
+                                        <span style="background:var(--green-light);color:var(--green-dark);font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:50px;">
+                                            <i class="bi bi-patch-check-fill me-1"></i>{{ $booking->terapis->username }}
+                                        </span>
+                                    @else
+                                        <span style="background:#f3f4f6;color:#6b7280;font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:50px;">
+                                            <i class="bi bi-clock me-1"></i>Menunggu penugasan admin
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Lokasi</td>
+                                <td>
+                                    @if($booking->location)
+                                        <i class="bi bi-geo-alt-fill me-1" style="color:var(--red-main);"></i>
+                                        {{ $booking->location->name_location }}
+                                    @else
+                                        <span style="font-size:.8rem;color:var(--text-muted);">
+                                            <i class="bi bi-clock me-1"></i>Menunggu konfirmasi admin
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Tanggal</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->date_booking)->isoFormat('dddd, D MMMM Y') }}</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jam</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->time_booking)->format('H:i') }} WIB</td></tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Ruangan</td>
+                                <td>
+                                    @if($booking->ruangan)
+                                        <i class="bi bi-door-open me-1" style="color:var(--green-mid);"></i>
+                                        {{ $booking->ruangan->nama_ruangan }}
+                                        <span style="font-size:.75rem;color:var(--text-muted);"> ({{ $booking->ruangan->gender_label }})</span>
+                                    @else
+                                        <span style="font-size:.8rem;color:var(--text-muted);">-</span>
+                                    @endif
+                                </td>
+                            </tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Metode Bayar</td>
                                 <td>
                                     @if($booking->payment_method === 'online')

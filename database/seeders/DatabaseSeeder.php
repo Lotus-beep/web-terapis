@@ -13,7 +13,6 @@ class DatabaseSeeder extends Seeder
             TerapisSeeder::class,
             LocationSeeder::class,
             ServiceCategorySeeder::class,
-            ServiceSeeder::class,
             CustomerSeeder::class,
         ]);
     }

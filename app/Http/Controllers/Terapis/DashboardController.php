@@ -31,7 +31,7 @@ class DashboardController extends Controller
 
         $avgRating = Comment::where('id_terapis', $terapisId)->avg('rating') ?? 0;
 
-        $recentBookings = Booking::with(['customer', 'service.location'])
+        $recentBookings = Booking::with(['customer', 'service'])
             ->where('id_terapis', $terapisId)
             ->orderBy('created_at', 'desc')
             ->take(5)->get();

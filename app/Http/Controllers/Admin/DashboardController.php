@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Comment;
-use App\Models\Service;
 use App\Models\Terapis;
 use App\Models\User;
 
@@ -17,8 +15,8 @@ class DashboardController extends Controller
         $totalTerapis  = Terapis::count();
         $totalBooking  = Booking::count();
         $totalPendapatan = Booking::where('booking.status_payment', 'paid')
-            ->join('service', 'booking.id_service', '=', 'service.id')
-            ->sum('service.price');
+            ->join('service_categories', 'booking.id_service', '=', 'service_categories.id')
+            ->sum('service_categories.price');
 
         $recentBookings = Booking::with(['customer', 'terapis', 'service'])
             ->orderBy('booking.created_at', 'desc')

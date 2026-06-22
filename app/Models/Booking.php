@@ -15,15 +15,21 @@ class Booking extends Model
     protected $fillable = [
         'id_customer',
         'id_terapis',
+        'id_location',
         'date_booking',
         'status_payment',
         'id_service',
+        'id_waktu_boking',
+        'id_ruangan',
         'status_service',
         'time_booking',
         'payment_proof',
         'payment_method',
         'snap_token',
         'midtrans_order_id',
+        'booking_for',
+        'second_username',
+        'gender_second',
     ];
 
     protected function casts(): array
@@ -43,9 +49,24 @@ class Booking extends Model
         return $this->belongsTo(Terapis::class, 'id_terapis');
     }
 
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Location::class, 'id_location');
+    }
+
+    public function waktuBoking(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\WaktuBoking::class, 'id_waktu_boking');
+    }
+
+    public function ruangan(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Ruangan::class, 'id_ruangan');
+    }
+
     public function service(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'id_service');
+        return $this->belongsTo(\App\Models\ServiceCategory::class, 'id_service');
     }
 
     public function getStatusPaymentLabelAttribute(): string

@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Location;
+use App\Models\Terapis;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Booking::with(['customer', 'terapis', 'service.location']);
+        $query = Booking::with(['customer', 'terapis', 'service']);
         if ($request->status_service) {
             $query->where('status_service', $request->status_service);
         }
@@ -23,8 +25,10 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking->load(['customer', 'terapis', 'service.location']);
-        return view('admin.bookings.show', compact('booking'));
+        $booking->load(['customer', 'terapis', 'location', 'service']);
+        $terapisList  = Terapis::orderBy('username')->get();
+        $locationList = Location::orderBy('name_location')->get();
+        return view('admin.bookings.show', compact('booking', 'terapisList', 'locationList'));
     }
 
     public function update(Request $request, Booking $booking)
@@ -32,6 +36,25 @@ class BookingController extends Controller
         $request->validate(['status_service' => 'required|in:pending,confirmed,in_progress,completed,cancelled']);
         $booking->update(['status_service' => $request->status_service]);
         return back()->with('success', 'Status booking berhasil diupdate.');
+    }
+
+    /**
+     * Admin assign terapis + lokasi ke booking
+     */
+    public function assignTerapis(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'id_terapis'  => 'required|exists:terapis,id',
+            'id_location' => 'nullable|exists:location,id',
+        ]);
+
+        $booking->update([
+            'id_terapis'     => $request->id_terapis,
+            'id_location'    => $request->id_location ?: null,
+            'status_service' => 'confirmed',
+        ]);
+
+        return back()->with('success', 'Terapis berhasil ditugaskan dan booking dikonfirmasi.');
     }
 
     public function confirmPayment(Request $request, Booking $booking)

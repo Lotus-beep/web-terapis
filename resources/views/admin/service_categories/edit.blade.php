@@ -44,6 +44,15 @@
                 <textarea name="description" class="form-control" rows="3">{{ old('description', $serviceCategory->description) }}</textarea>
             </div>
 
+            <div class="mb-3">
+                <label class="form-label">Harga Layanan <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="number" name="price" class="form-control"
+                        value="{{ old('price', $serviceCategory->price) }}" min="0" step="1000" required>
+                </div>
+            </div>
+
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label class="form-label">

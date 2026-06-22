@@ -13,16 +13,18 @@ class ServiceCategory extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
         'header_content',
+        'description',
         'icon',
         'image',
+        'price',
         'is_active',
         'sort_order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'price'     => 'decimal:2',
     ];
 
     // Auto-generate slug dari name saat create
@@ -41,9 +43,9 @@ class ServiceCategory extends Model
         });
     }
 
-    public function services(): HasMany
+    public function bookings(): HasMany
     {
-        return $this->hasMany(Service::class, 'id_category');
+        return $this->hasMany(\App\Models\Booking::class, 'id_service');
     }
 
     // Gambar: pakai upload jika ada, fallback ke default per slug

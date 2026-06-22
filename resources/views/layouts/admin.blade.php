@@ -320,11 +320,8 @@
             <a href="{{ route('admin.terapis.index') }}" class="nav-link {{ request()->routeIs('admin.terapis.*') ? 'active' : '' }}">
                 <i class="bi bi-person-badge"></i> Terapis
             </a>
-            <a href="{{ route('admin.services.index') }}" class="nav-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
-                <i class="bi bi-clipboard2-pulse"></i> Services
-            </a>
             <a href="{{ route('admin.service-categories.index') }}" class="nav-link {{ request()->routeIs('admin.service-categories.*') ? 'active' : '' }}">
-                <i class="bi bi-tags"></i> Kategori Layanan
+                <i class="bi bi-clipboard2-pulse"></i> Kategori Layanan
             </a>
             <a href="{{ route('admin.locations.index') }}" class="nav-link {{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                 <i class="bi bi-geo-alt"></i> Locations

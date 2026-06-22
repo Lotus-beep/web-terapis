@@ -27,6 +27,7 @@ class ServiceCategoryController extends Controller
             'name'           => 'required|string|max:100',
             'header_content' => 'nullable|string|max:200',
             'description'    => 'nullable|string|max:500',
+            'price'          => 'required|numeric|min:0',
             'icon'           => 'nullable|string|max:100',
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active'      => 'nullable|boolean',
@@ -43,6 +44,7 @@ class ServiceCategoryController extends Controller
             'slug'           => Str::slug($request->name),
             'header_content' => $request->header_content,
             'description'    => $request->description,
+            'price'          => $request->price,
             'icon'           => $request->icon ?? 'bi-heart-pulse-fill',
             'image'          => $imagePath,
             'is_active'      => $request->boolean('is_active', true),
@@ -64,6 +66,7 @@ class ServiceCategoryController extends Controller
             'name'           => 'required|string|max:100',
             'header_content' => 'nullable|string|max:200',
             'description'    => 'nullable|string|max:500',
+            'price'          => 'required|numeric|min:0',
             'icon'           => 'nullable|string|max:100',
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active'      => 'nullable|boolean',
@@ -75,6 +78,7 @@ class ServiceCategoryController extends Controller
             'slug'           => Str::slug($request->name),
             'header_content' => $request->header_content,
             'description'    => $request->description,
+            'price'          => $request->price,
             'icon'           => $request->icon ?? 'bi-heart-pulse-fill',
             'is_active'      => $request->boolean('is_active', true),
             'sort_order'     => $request->sort_order ?? 0,
@@ -95,9 +99,9 @@ class ServiceCategoryController extends Controller
 
     public function destroy(ServiceCategory $serviceCategory)
     {
-        // Cek apakah ada service yang pakai kategori ini
-        if ($serviceCategory->services()->count() > 0) {
-            return back()->with('error', 'Kategori tidak bisa dihapus karena masih digunakan oleh ' . $serviceCategory->services()->count() . ' layanan.');
+        // Cek apakah ada booking yang menggunakan kategori ini
+        if ($serviceCategory->bookings()->count() > 0) {
+            return back()->with('error', 'Kategori tidak bisa dihapus karena masih digunakan oleh ' . $serviceCategory->bookings()->count() . ' booking.');
         }
 
         if ($serviceCategory->image) {

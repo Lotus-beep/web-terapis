@@ -19,8 +19,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // CRUD Terapis
     Route::resource('terapis', App\Http\Controllers\Admin\TerapisController::class);
     
-    // CRUD Services
-    Route::resource('services', App\Http\Controllers\Admin\ServiceController::class);
 
     // CRUD Service Categories
     Route::resource('service-categories', App\Http\Controllers\Admin\ServiceCategoryController::class);
@@ -32,6 +30,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class);
     Route::patch('bookings/{booking}/confirm-payment', [App\Http\Controllers\Admin\BookingController::class, 'confirmPayment'])->name('bookings.confirm-payment');
     Route::patch('bookings/{booking}/reject-payment', [App\Http\Controllers\Admin\BookingController::class, 'rejectPayment'])->name('bookings.reject-payment');
+    Route::patch('bookings/{booking}/assign-terapis', [App\Http\Controllers\Admin\BookingController::class, 'assignTerapis'])->name('bookings.assign-terapis');
     
     // Lihat Comments
     Route::get('comments', [App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');
@@ -58,6 +57,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth', 'customer'])->
     Route::post('bookings/{booking}/payment', [App\Http\Controllers\Customer\BookingController::class, 'uploadPayment'])->name('bookings.payment');
     Route::post('bookings/{booking}/comment', [App\Http\Controllers\Customer\BookingController::class, 'storeComment'])->name('bookings.comment');
     Route::get('/bookings/slots', [App\Http\Controllers\Customer\BookingController::class, 'getBookedSlots'])->name('bookings.slots');
+    Route::get('/bookings/ruangan', [App\Http\Controllers\Customer\BookingController::class, 'getRuangan'])->name('bookings.ruangan');
 
     // Profile
     Route::get('/profile', [App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('profile.edit');

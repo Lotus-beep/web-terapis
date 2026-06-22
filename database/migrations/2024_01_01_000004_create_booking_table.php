@@ -21,7 +21,7 @@ return new class extends Migration
                 'rejected',
                 'expired',
             ])->default('unpaid');
-            $table->foreignId('id_service')->constrained('service')->onDelete('cascade');
+            $table->foreignId('id_service')->constrained('service_categories')->onDelete('cascade');
             $table->enum('status_service', [
                 'pending',
                 'confirmed',

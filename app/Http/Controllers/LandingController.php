@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Terapis;
 use Illuminate\Http\Request;
 
@@ -10,10 +10,9 @@ class LandingController extends Controller
 {
     public function index()
     {
-        // Ambil 6 service terbaru dengan kategori
-        $services = Service::with(['terapis', 'location', 'category'])
-            ->where('is_active', true)
-            ->orderBy('created_at', 'desc')
+        // Ambil 6 service categories aktif
+        $services = ServiceCategory::where('is_active', true)
+            ->orderBy('sort_order')
             ->take(6)
             ->get();
 

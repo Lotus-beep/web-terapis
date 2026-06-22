@@ -14,6 +14,8 @@ class Location extends Model
 
     protected $fillable = [
         'name_location',
+        'type_ruangan',
+        'maximal_ruangan'
     ];
 
     public function services(): HasMany

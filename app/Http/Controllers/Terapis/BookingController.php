@@ -18,7 +18,7 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $terapisId = $this->getTerapisId();
-        $query = Booking::with(['customer', 'service.location'])
+        $query = Booking::with(['customer', 'service'])
             ->where('id_terapis', $terapisId);
 
         if ($request->status_service) {
@@ -53,7 +53,7 @@ class BookingController extends Controller
     public function schedule(Request $request)
     {
         $terapisId = $this->getTerapisId();
-        $query = Booking::with(['customer', 'service.location'])
+        $query = Booking::with(['customer', 'service'])
             ->where('id_terapis', $terapisId)
             ->whereIn('status_service', ['confirmed', 'in_progress']);
 

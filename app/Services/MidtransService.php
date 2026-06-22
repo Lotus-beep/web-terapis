@@ -45,7 +45,7 @@ class MidtransService
                     'id'       => (string) $booking->service->id,
                     'price'    => (int) $booking->service->price,
                     'quantity' => 1,
-                    'name'     => substr($booking->service->name_service, 0, 50),
+                    'name'     => substr($booking->service->name, 0, 50),
                 ],
             ],
             // Tidak set callbacks di sini — pakai URL dari Midtrans Dashboard
