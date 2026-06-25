@@ -40,7 +40,7 @@
                         </td>
                         <td>{{ $b->service->name_service ?? '-' }}</td>
                         <td>{{ \Carbon\Carbon::parse($b->date_booking)->format('d M Y') }}</td>
-                        <td>{{ \Carbon\Carbon::parse($b->time_booking)->format('H:i') }}</td>
+                        <td>{{ $b->formatted_time }}</td>
                         <td><span class="badge bg-{{ $sc[$b->status_service]??'secondary' }}">{{ ucfirst(str_replace('_',' ',$b->status_service)) }}</span></td>
                         <td><span class="badge bg-{{ $pc[$b->status_payment]??'secondary' }}">{{ ucfirst(str_replace('_',' ',$b->status_payment)) }}</span></td>
                         <td>

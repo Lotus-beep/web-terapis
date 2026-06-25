@@ -38,6 +38,7 @@
         <input type="hidden" name="id_service" value="{{ $service->id }}">
         <input type="hidden" name="id_waktu_boking" id="inputWaktuBoking">
         <input type="hidden" name="id_ruangan" id="inputRuangan">
+        <input type="hidden" name="id_bed" id="inputBed">
 
         <div class="row g-4">
 
@@ -123,67 +124,49 @@
                     </div>
                 </div>
 
-                {{-- STEP 2: Pilih Tanggal --}}
+                {{-- STEP 2: Pilih Tanggal & Sesi --}}
                 <div class="booking-step" id="step2">
                     <div class="step-header">
                         <span class="step-num">2</span>
-                        <span class="step-title">Pilih Tanggal</span>
+                        <span class="step-title">Pilih Tanggal & Sesi</span>
                     </div>
                     <div class="step-body">
-                        @if(count($availableDates) === 0)
-                            <div class="text-center py-3" style="color:var(--text-muted);font-size:.875rem;">
-                                <i class="bi bi-calendar-x" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
-                                Belum ada jadwal tersedia. Hubungi admin untuk informasi jadwal.
+                        <div class="d-flex align-items-center justify-content-center mb-4">
+                            <div style="max-width: 280px; width: 100%;">
+                                <input type="date" id="inputDatePicker" class="form-control text-center fw-bold" 
+                                    style="border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px;"
+                                    min="{{ date('Y-m-d') }}" value="{{ old('date_booking') }}">
                             </div>
-                        @else
-                        <div class="d-flex flex-wrap gap-2" id="dateList">
-                            @foreach($availableDates as $d)
-                                @php
-                                    $carbon = \Carbon\Carbon::parse($d);
-                                    $isSelected = old('date_booking') === $d;
-                                @endphp
-                                <button type="button" class="date-btn {{ $isSelected ? 'selected' : '' }}"
-                                    data-date="{{ $d }}">
-                                    <div style="font-size:.75rem;font-weight:600;opacity:.8;">{{ $carbon->isoFormat('ddd') }}</div>
-                                    <div style="font-size:1.2rem;font-weight:800;line-height:1;">{{ $carbon->format('d') }}</div>
-                                    <div style="font-size:.7rem;">{{ $carbon->isoFormat('MMM') }}</div>
-                                </button>
-                            @endforeach
                         </div>
-                        <input type="hidden" name="date_booking" id="inputDate" value="{{ old('date_booking') }}">
-                        @endif
-                    </div>
-                </div>
 
-                {{-- STEP 3: Pilih Slot Waktu (UI Bioskop) --}}
-                <div class="booking-step" id="step3">
-                    <div class="step-header">
-                        <span class="step-num">3</span>
-                        <span class="step-title">Pilih Slot Waktu</span>
-                    </div>
-                    <div class="step-body">
-                        <div id="slotLoading" style="display:none;" class="text-center py-3">
+                        <div id="slotLoading" style="display:none;" class="text-center py-4">
                             <div class="spinner-border spinner-border-sm text-success me-2"></div>
                             Memuat slot...
                         </div>
-                        <div id="slotContainer">
-                            <p style="font-size:.82rem;color:var(--text-muted);">Pilih tanggal terlebih dahulu.</p>
-                        </div>
-                        <input type="hidden" name="time_booking" id="inputTime">
 
-                        {{-- Legenda --}}
-                        <div class="d-flex gap-3 mt-3 flex-wrap" style="font-size:.75rem;">
-                            <div class="d-flex align-items-center gap-1"><div class="legend-box available"></div>Tersedia</div>
-                            <div class="d-flex align-items-center gap-1"><div class="legend-box selected-leg"></div>Dipilih</div>
-                            <div class="d-flex align-items-center gap-1"><div class="legend-box full"></div>Penuh</div>
+                        <div id="slotSection" class="d-none">
+                            <h5 class="mb-3 text-center fw-semibold" style="font-size: 1rem; color: var(--text-dark);" id="slotHeaderTitle">Pilih tanggal booking</h5>
+                            
+                            <div class="d-grid gap-3 justify-content-center mb-4" style="grid-template-columns: repeat(3, minmax(110px, 120px)); margin: 0 auto; max-width: 380px;" id="slotGridContainer">
+                                <!-- Standard 9 slot buttons dynamically rendered -->
+                            </div>
+                            
+                            <div class="text-center mb-4">
+                                <button type="button" id="btnClearSelection" class="btn text-danger border-danger d-inline-flex align-items-center gap-1 bg-white" style="border: 1px solid var(--red-main); border-radius: 8px; font-size: 0.9rem; padding: 6px 14px; font-weight: 500;">
+                                    <i class="bi bi-trash"></i> clear
+                                </button>
+                            </div>
                         </div>
+                        
+                        <input type="hidden" name="date_booking" id="inputDate" value="{{ old('date_booking') }}">
+                        <input type="hidden" name="time_booking" id="inputTime">
                     </div>
                 </div>
 
-                {{-- STEP 4: Pilih Ruangan --}}
-                <div class="booking-step" id="step4">
+                {{-- STEP 3: Pilih Ruangan --}}
+                <div class="booking-step" id="step3">
                     <div class="step-header">
-                        <span class="step-num">4</span>
+                        <span class="step-num">3</span>
                         <span class="step-title">Pilih Ruangan</span>
                     </div>
                     <div class="step-body">
@@ -193,6 +176,23 @@
                         </div>
                         <div id="ruanganContainer">
                             <p style="font-size:.82rem;color:var(--text-muted);">Pilih slot waktu terlebih dahulu.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- STEP 4: Pilih Bed --}}
+                <div class="booking-step" id="step4">
+                    <div class="step-header">
+                        <span class="step-num">4</span>
+                        <span class="step-title">Pilih Bed</span>
+                    </div>
+                    <div class="step-body">
+                        <div id="bedLoading" style="display:none;" class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                            Memuat bed...
+                        </div>
+                        <div id="bedContainer">
+                            <p style="font-size:.82rem;color:var(--text-muted);">Pilih ruangan terlebih dahulu.</p>
                         </div>
                     </div>
                 </div>
@@ -254,6 +254,10 @@
                             <span class="summary-label">Ruangan</span>
                             <span class="summary-value" id="summaryRuangan">-</span>
                         </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Bed</span>
+                            <span class="summary-value" id="summaryBed">-</span>
+                        </div>
                         <hr>
                         <div class="summary-item">
                             <span class="summary-label fw-bold">Total</span>
@@ -295,21 +299,47 @@
 .date-btn:hover { border-color:var(--green-mid); background:var(--green-light); }
 .date-btn.selected { border-color:var(--green-dark); background:var(--green-dark); color:white; }
 
-/* ===== SLOT (BIOSKOP) ===== */
-.slot-grid { display:flex; flex-wrap:wrap; gap:10px; }
-.slot-card {
-    border:2px solid var(--border-soft); border-radius:10px; padding:10px 14px;
-    text-align:center; cursor:pointer; transition:all .2s; background:white;
-    min-width:90px; position:relative;
+/* ===== SLOT MOCKUP ===== */
+.slot-btn-mockup {
+    background: white;
+    border: 1px solid #1c2b22;
+    border-radius: 8px;
+    padding: 12px 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1c2b22;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.slot-card:hover:not(.full) { border-color:var(--green-mid); background:var(--green-light); }
-.slot-card.selected { border-color:var(--green-dark); background:var(--green-dark); color:white; }
-.slot-card.full { background:#f3f4f6; border-color:#e5e7eb; color:#9ca3af; cursor:not-allowed; }
-.slot-card .slot-time { font-weight:800; font-size:1rem; }
-.slot-card .slot-sisa { font-size:.68rem; margin-top:2px; }
-.slot-card.selected .slot-sisa { color:rgba(255,255,255,.75); }
-.slot-card.full .slot-sisa { color:#9ca3af; }
-.slot-card .slot-sisa:not(.full) { color:var(--green-mid); }
+.slot-btn-mockup:hover:not(.full):not(.selected) {
+    background: var(--green-light);
+    border-color: var(--green-mid);
+    color: var(--green-dark);
+}
+.slot-btn-mockup.selected {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: white !important;
+}
+.slot-btn-mockup.full {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+.slot-btn-mockup .slot-sisa-txt {
+    font-size: 0.68rem;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+.slot-btn-mockup.selected .slot-sisa-txt {
+    color: rgba(255,255,255,0.85);
+}
 
 /* ===== RUANGAN (BIOSKOP) ===== */
 .ruangan-grid { display:flex; flex-direction:column; gap:10px; }
@@ -344,6 +374,20 @@
 .pay-opt i { font-size:1.5rem; }
 input[type=radio]:checked + .pay-opt { border-color:var(--green-mid); background:var(--green-light); color:var(--green-dark); }
 
+/* ===== BED SELECTION ===== */
+.bed-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.bed-card {
+    border: 2px solid var(--border-soft); border-radius: 10px; padding: 12px 16px;
+    text-align: center; cursor: pointer; transition: all .2s; background: white;
+    min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.bed-card:hover:not(.booked) { border-color: var(--green-mid); background: var(--green-light); }
+.bed-card.selected { border-color: var(--green-dark); background: var(--green-dark); color: white; }
+.bed-card.booked { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; cursor: not-allowed; }
+.bed-card i { font-size: 1.5rem; margin-bottom: 4px; }
+.bed-card.selected i { color: white; }
+.bed-card.booked i { color: #ef4444; }
+
 /* ===== SUMMARY ===== */
 .summary-item { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px; font-size:.85rem; }
 .summary-label { color:var(--text-muted); flex-shrink:0; }
@@ -356,6 +400,7 @@ input[type=radio]:checked + .pay-opt { border-color:var(--green-mid); background
 const serviceId   = {{ $service->id }};
 const slotsUrl    = '{{ route("customer.bookings.slots") }}';
 const ruanganUrl  = '{{ route("customer.bookings.ruangan") }}';
+const bedsUrl     = '{{ route("customer.bookings.beds") }}';
 const selfGender  = '{{ auth()->user()->gender ?? "" }}';
 
 let selectedDate    = document.getElementById('inputDate').value || '';
@@ -363,6 +408,8 @@ let selectedJam     = document.getElementById('inputTime').value || '';
 let selectedSlotId  = document.getElementById('inputWaktuBoking').value || '';
 let selectedRoomId  = document.getElementById('inputRuangan').value || '';
 let selectedRoomName = '';
+let selectedBedId   = document.getElementById('inputBed').value || '';
+let selectedBedName = '';
 
 // ======== UNTUK SIAPA ========
 document.querySelectorAll('input[name="booking_for"]').forEach(r => {
@@ -402,23 +449,48 @@ function updateSummaryPasien() {
 }
 document.getElementById('secondUsername')?.addEventListener('input', updateSummaryPasien);
 
-// ======== TANGGAL ========
-document.querySelectorAll('.date-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
-        this.classList.add('selected');
-        selectedDate = this.dataset.date;
-        document.getElementById('inputDate').value = selectedDate;
-
-        // Update summary
-        const d = new Date(selectedDate + 'T00:00:00');
-        const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
-        document.getElementById('summaryTanggal').textContent = d.toLocaleDateString('id-ID', opts);
-
-        resetSlotAndRoom();
-        loadSlots(selectedDate);
-    });
+// ======== TANGGAL & SESI ========
+document.getElementById('inputDatePicker').addEventListener('change', function() {
+    triggerCheckSlots();
 });
+
+function triggerCheckSlots() {
+    const pickedDate = document.getElementById('inputDatePicker').value;
+    if (!pickedDate) {
+        alert('Pilih tanggal terlebih dahulu.');
+        return;
+    }
+    selectedDate = pickedDate;
+    document.getElementById('inputDate').value = selectedDate;
+
+    // Update summary tanggal
+    document.getElementById('summaryTanggal').textContent = formatDateStr(selectedDate);
+
+    resetSlotAndRoom();
+    loadSlots(selectedDate);
+}
+
+function formatDateStr(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr + 'T00:00:00');
+    const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+    return d.toLocaleDateString('id-ID', opts);
+}
+
+function formatSlotRange(timeStr) {
+    const ranges = {
+        '08:00': '08:00-09:00',
+        '09:30': '09:30-10:30',
+        '11:00': '11:00-12:00',
+        '12:30': '12:30-13:30',
+        '14:00': '14:00-15:00',
+        '15:30': '15:30-16:30',
+        '17:00': '17:00-18:00',
+        '18:30': '18:30-19:30',
+        '20:00': '20:00-21:00'
+    };
+    return ranges[timeStr] || timeStr;
+}
 
 // ======== LOAD SLOTS (AJAX) ========
 function resetSlotAndRoom() {
@@ -426,19 +498,24 @@ function resetSlotAndRoom() {
     selectedSlotId = '';
     selectedRoomId = '';
     selectedRoomName = '';
+    selectedBedId   = '';
+    selectedBedName = '';
     document.getElementById('inputTime').value       = '';
     document.getElementById('inputWaktuBoking').value = '';
     document.getElementById('inputRuangan').value    = '';
+    document.getElementById('inputBed').value        = '';
     document.getElementById('summaryJam').textContent     = '-';
     document.getElementById('summaryRuangan').textContent = '-';
+    document.getElementById('summaryBed').textContent     = '-';
     document.getElementById('ruanganContainer').innerHTML = '<p style="font-size:.82rem;color:var(--text-muted);">Pilih slot waktu terlebih dahulu.</p>';
+    document.getElementById('bedContainer').innerHTML     = '<p style="font-size:.82rem;color:var(--text-muted);">Pilih ruangan terlebih dahulu.</p>';
     checkSubmit();
 }
 
 function loadSlots(date) {
     const gender = getGenderPasien();
-    document.getElementById('slotLoading').style.display    = 'block';
-    document.getElementById('slotContainer').style.display  = 'none';
+    document.getElementById('slotLoading').style.display   = 'block';
+    document.getElementById('slotSection').classList.add('d-none');
 
     const params = new URLSearchParams({ service_id: serviceId, date, gender });
 
@@ -446,51 +523,85 @@ function loadSlots(date) {
         .then(r => r.json())
         .then(data => {
             document.getElementById('slotLoading').style.display   = 'none';
-            document.getElementById('slotContainer').style.display = 'block';
+            document.getElementById('slotSection').classList.remove('d-none');
 
             if (!data.slots || data.slots.length === 0) {
-                document.getElementById('slotContainer').innerHTML =
-                    '<p style="font-size:.82rem;color:var(--text-muted);"><i class="bi bi-calendar-x me-1"></i>' +
-                    (data.message || 'Tidak ada slot tersedia.') + '</p>';
+                document.getElementById('slotGridContainer').innerHTML = 
+                    `<p class="text-danger small text-center mb-0" style="grid-column: span 3; font-weight: 600; padding: 15px 0;">
+                        <i class="bi bi-calendar-x me-1"></i>${data.message || 'Jadwal tidak tersedia pada tanggal ini.'}
+                    </p>`;
                 return;
             }
 
-            let html = '<div class="slot-grid">';
+            let html = '';
+
             data.slots.forEach(s => {
-                const isFull  = s.is_full;
-                const cls     = isFull ? 'full' : (selectedJam === s.jam ? 'selected' : '');
-                const sisaTxt = isFull ? 'Penuh' : `${s.sisa} kursi`;
-                html += `<div class="slot-card ${cls}" data-jam="${s.jam}" data-sisa="${s.sisa}" ${isFull ? '' : 'onclick="selectSlot(this)"'}>
-                    <div class="slot-time">${s.jam}</div>
-                    <div class="slot-sisa ${isFull ? 'full' : ''}">${sisaTxt}</div>
-                </div>`;
+                const hour = s.jam.substring(0, 5);
+                const hourEnd = s.jam_selesai ? s.jam_selesai.substring(0, 5) : '';
+                const rangeLabel = hourEnd ? `${hour}-${hourEnd}` : hour;
+                const displayName = s.nama_sesi ? `${s.nama_sesi} (${rangeLabel})` : `${rangeLabel}`;
+
+                const isFull = s.is_full;
+                const sisa = s.sisa;
+
+                const cls = isFull ? 'full' : (selectedJam === hour ? 'selected' : '');
+                const clickAttr = isFull ? '' : `onclick="selectSlot(this)"`;
+                const sisaTxt = isFull ? 'Penuh' : `${sisa} sisa`;
+
+                html += `<button type="button" class="slot-btn-mockup ${cls}" data-jam="${hour}" data-display-name="${displayName}" ${clickAttr}>
+                    <div class="fw-bold">${displayName}</div>
+                    <div class="slot-sisa-txt">${sisaTxt}</div>
+                </button>`;
             });
-            html += '</div>';
-            document.getElementById('slotContainer').innerHTML = html;
+
+            document.getElementById('slotGridContainer').innerHTML = html;
         })
-        .catch(() => {
+        .catch((err) => {
+            console.error(err);
             document.getElementById('slotLoading').style.display   = 'none';
-            document.getElementById('slotContainer').style.display = 'block';
-            document.getElementById('slotContainer').innerHTML = '<p class="text-danger small">Gagal memuat slot. Coba lagi.</p>';
+            document.getElementById('slotSection').classList.remove('d-none');
+            document.getElementById('slotGridContainer').innerHTML = '<p class="text-danger small col-span-3 text-center">Gagal memuat slot. Pastikan admin telah mengatur jadwal operasional tanggal ini.</p>';
         });
 }
 
 function selectSlot(el) {
-    document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.slot-btn-mockup').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     selectedJam = el.dataset.jam;
     document.getElementById('inputTime').value = selectedJam;
-    document.getElementById('summaryJam').textContent = selectedJam + ' WIB';
+    document.getElementById('summaryJam').textContent = el.dataset.displayName + ' WIB';
 
     selectedSlotId = '';
     selectedRoomId = '';
     document.getElementById('inputWaktuBoking').value = '';
     document.getElementById('inputRuangan').value     = '';
     document.getElementById('summaryRuangan').textContent = '-';
+    
+    // Reset bed
+    selectedBedId   = '';
+    selectedBedName = '';
+    document.getElementById('inputBed').value = '';
+    document.getElementById('summaryBed').textContent = '-';
+    
     checkSubmit();
-
     loadRuangan(selectedDate, selectedJam);
+
+    // Smooth scroll to step 3 (ruangan)
+    const targetElement = document.getElementById('step3');
+    if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
+
+// Clear Selection
+document.getElementById('btnClearSelection').addEventListener('click', function() {
+    document.getElementById('inputDatePicker').value = '';
+    selectedDate = '';
+    document.getElementById('inputDate').value = '';
+    document.getElementById('summaryTanggal').textContent = '-';
+    document.getElementById('slotSection').classList.add('d-none');
+    resetSlotAndRoom();
+});
 
 // ======== LOAD RUANGAN (AJAX) ========
 function loadRuangan(date, jam) {
@@ -563,6 +674,64 @@ function selectRuangan(el) {
     document.getElementById('inputWaktuBoking').value = selectedSlotId;
     document.getElementById('inputRuangan').value     = selectedRoomId;
     document.getElementById('summaryRuangan').textContent = selectedRoomName;
+
+    // Reset bed
+    selectedBedId   = '';
+    selectedBedName = '';
+    document.getElementById('inputBed').value = '';
+    document.getElementById('summaryBed').textContent = '-';
+    
+    checkSubmit();
+    loadBeds(selectedSlotId);
+}
+
+// ======== LOAD BEDS (AJAX) ========
+function loadBeds(waktuBokingId) {
+    document.getElementById('bedLoading').style.display = 'block';
+    document.getElementById('bedContainer').style.display = 'none';
+
+    const params = new URLSearchParams({ waktu_boking_id: waktuBokingId });
+
+    fetch(bedsUrl + '?' + params.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('bedLoading').style.display = 'none';
+            document.getElementById('bedContainer').style.display = 'block';
+
+            if (!data.beds || data.beds.length === 0) {
+                document.getElementById('bedContainer').innerHTML =
+                    '<p style="font-size:.82rem;color:var(--text-muted);"><i class="bi bi-exclamation-triangle me-1"></i>Tidak ada bed aktif di ruangan ini.</p>';
+                return;
+            }
+
+            let html = '<div class="bed-grid">';
+            data.beds.forEach(b => {
+                const isBooked = b.is_booked;
+                const cls = isBooked ? 'booked' : (selectedBedId == b.id ? 'selected' : '');
+                html += `<div class="bed-card ${cls}" data-id="${b.id}" data-nama="${b.nama_bed}" ${isBooked ? '' : 'onclick="selectBed(this)"'}>
+                    <i class="bi bi-hospital"></i>
+                    <div class="fw-bold" style="font-size:.85rem;">${b.nama_bed}</div>
+                    <div style="font-size:.7rem;margin-top:2px;opacity:.8;">${isBooked ? 'Terisi' : 'Kosong'}</div>
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('bedContainer').innerHTML = html;
+        })
+        .catch(() => {
+            document.getElementById('bedLoading').style.display = 'none';
+            document.getElementById('bedContainer').style.display = 'block';
+            document.getElementById('bedContainer').innerHTML = '<p class="text-danger small">Gagal memuat daftar bed.</p>';
+        });
+}
+
+function selectBed(el) {
+    document.querySelectorAll('.bed-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedBedId   = el.dataset.id;
+    selectedBedName = el.dataset.nama;
+
+    document.getElementById('inputBed').value = selectedBedId;
+    document.getElementById('summaryBed').textContent = selectedBedName;
     checkSubmit();
 }
 
@@ -573,7 +742,7 @@ function checkSubmit() {
     const isOther = document.getElementById('bf_other').checked;
     const pmOk  = document.querySelector('input[name="payment_method"]:checked');
 
-    const ready = selectedDate && selectedJam && selectedSlotId && selectedRoomId && pmOk
+    const ready = selectedDate && selectedJam && selectedSlotId && selectedRoomId && selectedBedId && pmOk
         && (!isOther || (document.getElementById('secondUsername').value.trim()
             && document.querySelector('input[name="gender_second"]:checked')));
 
@@ -585,9 +754,9 @@ function checkSubmit() {
 document.querySelectorAll('input[name="payment_method"]').forEach(r => r.addEventListener('change', checkSubmit));
 
 document.getElementById('bookingForm').addEventListener('submit', function(e) {
-    if (!selectedSlotId || !selectedRoomId) {
+    if (!selectedSlotId || !selectedRoomId || !selectedBedId) {
         e.preventDefault();
-        alert('Pilih slot waktu dan ruangan terlebih dahulu.');
+        alert('Pilih slot waktu, ruangan, dan bed terlebih dahulu.');
         return;
     }
     const isOther = document.getElementById('bf_other').checked;

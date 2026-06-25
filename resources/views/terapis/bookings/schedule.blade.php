@@ -41,10 +41,15 @@
                                     <div>
                                         <div class="fw-semibold">{{ $b->customer->username ?? '-' }}</div>
                                         <div class="text-muted small">{{ $b->service->name_service ?? '-' }}</div>
-                                        <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ $b->service->location->name_location ?? '-' }}</div>
+                                        <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ $b->location->name_location ?? '-' }}</div>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-door-open me-1"></i>{{ $b->ruangan->nama_ruangan ?? '-' }}
+                                            &bull;
+                                            <i class="bi bi-hospital me-1"></i>{{ $b->bed->nama_bed ?? '-' }}
+                                        </div>
                                     </div>
                                     <div class="text-end">
-                                        <div class="fw-bold text-primary">{{ \Carbon\Carbon::parse($b->time_booking)->format('H:i') }}</div>
+                                        <div class="fw-bold text-primary small">{{ $b->formatted_time }}</div>
                                         <span class="badge bg-{{ $sc[$b->status_service]??'secondary' }} small">{{ ucfirst(str_replace('_',' ',$b->status_service)) }}</span>
                                     </div>
                                 </div>

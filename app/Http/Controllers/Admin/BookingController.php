@@ -25,7 +25,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking->load(['customer', 'terapis', 'location', 'service']);
+        $booking->load(['customer', 'terapis', 'location', 'service', 'ruangan', 'bed']);
         $terapisList  = Terapis::orderBy('username')->get();
         $locationList = Location::orderBy('name_location')->get();
         return view('admin.bookings.show', compact('booking', 'terapisList', 'locationList'));

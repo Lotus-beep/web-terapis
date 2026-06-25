@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             ServiceCategorySeeder::class,
             CustomerSeeder::class,
+            RuanganAndBedSeeder::class,
+            MasterSesiSeeder::class,
         ]);
     }
 }

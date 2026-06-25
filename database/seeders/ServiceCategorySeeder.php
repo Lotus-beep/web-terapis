@@ -17,6 +17,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Terapi bekam basah (wet cupping) untuk mengeluarkan darah kotor dan racun dari tubuh. Efektif untuk berbagai keluhan kesehatan kronis maupun akut.',
                 'icon'        => 'bi-droplet-fill',
                 'sort_order'  => 1,
+                'price'       => 150000,
             ],
             [
                 'name'        => 'Fashdu',
@@ -24,6 +25,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Fashdu atau bekam kering adalah terapi menghisap kulit tanpa sayatan. Melancarkan peredaran darah dan mengurangi rasa nyeri otot.',
                 'icon'        => 'bi-wind',
                 'sort_order'  => 2,
+                'price'       => 100000,
             ],
             [
                 'name'        => 'Gurah',
@@ -31,6 +33,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Terapi gurah untuk membersihkan saluran pernapasan bagian atas dari lendir dan kotoran. Membantu mengatasi sinusitis dan alergi.',
                 'icon'        => 'bi-water',
                 'sort_order'  => 3,
+                'price'       => 120000,
             ],
             [
                 'name'        => 'Akupuntur',
@@ -38,6 +41,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Terapi akupuntur dengan jarum halus pada titik-titik meridian tubuh untuk menyeimbangkan energi dan mengatasi berbagai keluhan kesehatan.',
                 'icon'        => 'bi-plus-circle-fill',
                 'sort_order'  => 4,
+                'price'       => 200000,
             ],
             [
                 'name'        => 'Pijat Syaraf Kejepit',
@@ -45,6 +49,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Terapi pijat khusus untuk mengatasi syaraf kejepit, nyeri punggung, pinggang, dan leher dengan teknik yang aman dan efektif.',
                 'icon'        => 'bi-activity',
                 'sort_order'  => 5,
+                'price'       => 175000,
             ],
             [
                 'name'        => 'Pijat Bayi & Anak',
@@ -52,6 +57,7 @@ class ServiceCategorySeeder extends Seeder
                 'description' => 'Layanan pijat khusus bayi dan anak dengan teknik lembut dan aman. Membantu tumbuh kembang si kecil secara optimal.',
                 'icon'        => 'bi-emoji-smile-fill',
                 'sort_order'  => 6,
+                'price'       => 130000,
             ],
         ];
 
@@ -64,6 +70,7 @@ class ServiceCategorySeeder extends Seeder
                 'image'       => null,
                 'is_active'   => true,
                 'sort_order'  => $cat['sort_order'],
+                'price'       => $cat['price'],
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ]);

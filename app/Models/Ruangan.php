@@ -25,6 +25,11 @@ class Ruangan extends Model
         return $this->hasMany(WaktuBoking::class, 'id_ruangan');
     }
 
+    public function beds(): HasMany
+    {
+        return $this->hasMany(Bed::class, 'id_ruangan');
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'id_ruangan');
@@ -39,6 +44,11 @@ class Ruangan extends Model
             ->where('id_waktu_boking', $waktuBokingId)
             ->whereNotIn('status_service', ['cancelled'])
             ->count();
+    }
+
+    public function getMaximalAttribute(): int
+    {
+        return $this->beds()->where('active', true)->count();
     }
 
     public function isFull(int $waktuBokingId): bool

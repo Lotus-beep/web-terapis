@@ -76,7 +76,7 @@
                         <div class="p-3 bg-light rounded">
                             <div class="text-muted small mb-1">Jadwal Booking</div>
                             <div class="fw-semibold">{{ \Carbon\Carbon::parse($booking->date_booking)->format('d M Y') }}</div>
-                            <div class="text-muted small">{{ \Carbon\Carbon::parse($booking->time_booking)->format('H:i') }} WIB</div>
+                            <div class="text-muted small">{{ $booking->formatted_time }}</div>
                         </div>
                     </div>
 
@@ -94,6 +94,24 @@
                                     <i class="bi bi-exclamation-triangle me-1"></i>Belum ditentukan
                                 </div>
                             @endif
+                        </div>
+                    </div>
+
+                    {{-- Ruangan & Bed --}}
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <div class="text-muted small mb-1">Ruangan & Bed</div>
+                            <div class="fw-semibold">
+                                <i class="bi bi-door-open-fill me-1 text-success"></i>
+                                {{ $booking->ruangan->nama_ruangan ?? '-' }}
+                                @if($booking->ruangan)
+                                    <span style="font-size:.75rem;color:var(--text-muted);"> ({{ $booking->ruangan->gender_label }})</span>
+                                @endif
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-hospital me-1"></i>
+                                {{ $booking->bed->nama_bed ?? '-' }}
+                            </div>
                         </div>
                     </div>
 

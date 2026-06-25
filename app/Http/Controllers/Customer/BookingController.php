@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Comment;
 use App\Models\Ruangan;
+use App\Models\Bed;
 use App\Models\ServiceCategory;
 use App\Models\Terapis;
 use App\Models\WaktuBoking;
@@ -58,27 +59,59 @@ class BookingController extends Controller
             'date'       => 'required|date',
         ]);
 
-        $waktuLayanan = WaktuLayanan::where('tanggal', $request->date)
-            ->where('active', true)
-            ->first();
+        $waktuLayanan = WaktuLayanan::where('tanggal', $request->date)->first();
 
         if (!$waktuLayanan) {
-            return response()->json(['slots' => [], 'message' => 'Tidak ada jadwal pada tanggal ini.']);
+            $waktuLayanan = WaktuLayanan::create([
+                'tanggal'     => $request->date,
+                'waktu_buka'  => '08:00',
+                'waktu_tutup' => '21:00',
+                'maximal'     => 10,
+                'active'      => true,
+            ]);
+        }
+
+        if (!$waktuLayanan->active) {
+            return response()->json(['slots' => [], 'message' => 'Klinik libur/tutup pada tanggal ini.']);
+        }
+
+        // Generate WaktuBoking slots dynamically based on active rooms and active master sessions
+        $activeMasterSessions = \App\Models\MasterSesi::where('active', true)->get();
+        $rooms = Ruangan::where('active', true)->get();
+
+        foreach ($activeMasterSessions as $ms) {
+            foreach ($rooms as $room) {
+                WaktuBoking::firstOrCreate([
+                    'id_waktu_layanan' => $waktuLayanan->id,
+                    'id_ruangan'        => $room->id,
+                    'kode_waktu_boking' => $ms->jam_mulai,
+                ], [
+                    'active'            => true,
+                ]);
+            }
         }
 
         // Ambil gender pasien untuk filter ruangan
         $customer = auth()->user();
-        $genderPasien = $request->booking_for === 'other'
+        $genderPasien = $request->gender ?: ($request->booking_for === 'other'
             ? $request->gender_second
-            : $customer->gender;
+            : $customer->gender);
 
-        // Ambil semua slot (waktu_boking) untuk tanggal ini
+        $activeHours = $activeMasterSessions->pluck('jam_mulai')->toArray();
+
+        // Ambil semua slot (waktu_boking) untuk tanggal ini yang terdaftar di Master Sesi aktif
         $slots = WaktuBoking::with(['ruangan'])
             ->where('id_waktu_layanan', $waktuLayanan->id)
             ->where('active', true)
+            ->whereIn('kode_waktu_boking', $activeHours)
             ->get()
             ->groupBy('kode_waktu_boking') // group by jam
             ->map(function ($slotGroup, $jam) use ($genderPasien) {
+                // Cari data MasterSesi untuk mendapatkan jam_selesai dan nama_sesi
+                $ms = \App\Models\MasterSesi::where('jam_mulai', $jam)->first();
+                $jamSelesai = $ms ? $ms->jam_selesai : \Carbon\Carbon::parse($jam)->addHour()->format('H:i');
+                $namaSesi = $ms ? $ms->nama_sesi : null;
+
                 // Filter ruangan sesuai gender
                 $ruanganAvailable = $slotGroup->filter(function ($slot) use ($genderPasien) {
                     $r = $slot->ruangan;
@@ -94,11 +127,13 @@ class BookingController extends Controller
                 $sisa = max(0, $totalKursi - $booked);
 
                 return [
-                    'jam'        => $jam,
-                    'total'      => $totalKursi,
-                    'booked'     => $booked,
-                    'sisa'       => $sisa,
-                    'is_full'    => $sisa === 0,
+                    'jam'         => $jam,
+                    'jam_selesai' => $jamSelesai,
+                    'nama_sesi'   => $namaSesi,
+                    'total'       => $totalKursi,
+                    'booked'      => $booked,
+                    'sisa'        => $sisa,
+                    'is_full'     => $sisa === 0,
                 ];
             })
             ->values();
@@ -132,6 +167,14 @@ class BookingController extends Controller
         }
 
         $gender = $request->gender ?: auth()->user()->gender;
+
+        $isHourActive = \App\Models\MasterSesi::where('jam_mulai', $request->jam)
+            ->where('active', true)
+            ->exists();
+
+        if (!$isHourActive) {
+            return response()->json(['ruangan' => []]);
+        }
 
         $slots = WaktuBoking::with(['ruangan'])
             ->where('id_waktu_layanan', $waktuLayanan->id)
@@ -168,6 +211,46 @@ class BookingController extends Controller
     }
 
     /**
+     * AJAX: Ambil daftar bed untuk slot waktu/ruangan tertentu
+     * GET /customer/bookings/beds?waktu_boking_id=
+     */
+    public function getBeds(Request $request)
+    {
+        $request->validate([
+            'waktu_boking_id' => 'required|exists:waktu_boking,id',
+        ]);
+
+        $waktuBoking = WaktuBoking::with(['ruangan'])->findOrFail($request->waktu_boking_id);
+        $ruangan = $waktuBoking->ruangan;
+
+        if (!$ruangan || !$ruangan->active) {
+            return response()->json(['beds' => []]);
+        }
+
+        // Ambil semua bed aktif di ruangan ini
+        $beds = Bed::where('id_ruangan', $ruangan->id)
+            ->where('active', true)
+            ->get();
+
+        // Ambil bed yang sudah dibooking pada slot waktu boking ini
+        $bookedBedIds = Booking::where('id_waktu_boking', $waktuBoking->id)
+            ->whereNotIn('status_service', ['cancelled'])
+            ->pluck('id_bed')
+            ->toArray();
+
+        $bedList = $beds->map(function ($bed) use ($bookedBedIds) {
+            $isBooked = in_array($bed->id, $bookedBedIds);
+            return [
+                'id'        => $bed->id,
+                'nama_bed'  => $bed->nama_bed,
+                'is_booked' => $isBooked,
+            ];
+        });
+
+        return response()->json(['beds' => $bedList]);
+    }
+
+    /**
      * Store booking baru
      */
     public function store(Request $request)
@@ -176,6 +259,7 @@ class BookingController extends Controller
             'id_service'       => 'required|exists:service_categories,id',
             'id_waktu_boking'  => 'required|exists:waktu_boking,id',
             'id_ruangan'       => 'required|exists:ruangan,id',
+            'id_bed'           => 'required|exists:beds,id',
             'payment_method'   => 'required|in:online,cash',
             'booking_for'      => 'required|in:self,other',
             'second_username'  => 'required_if:booking_for,other|nullable|string|max:100',
@@ -186,10 +270,31 @@ class BookingController extends Controller
         $customer    = auth()->user();
         $waktuBoking = WaktuBoking::with(['waktuLayanan', 'ruangan'])->findOrFail($request->id_waktu_boking);
         $ruangan     = Ruangan::findOrFail($request->id_ruangan);
+        $bed         = Bed::findOrFail($request->id_bed);
 
         // Validasi ruangan milik slot yang dipilih
         if ($waktuBoking->id_ruangan != $ruangan->id) {
             return back()->with('error', 'Ruangan tidak sesuai dengan slot yang dipilih.');
+        }
+
+        // Validasi bed milik ruangan yang dipilih
+        if ($bed->id_ruangan != $ruangan->id) {
+            return back()->with('error', 'Bed tidak berada di ruangan yang dipilih.');
+        }
+
+        // Cek apakah bed aktif
+        if (!$bed->active) {
+            return back()->with('error', 'Bed yang Anda pilih sedang tidak aktif.');
+        }
+
+        // Cek apakah bed sudah dipesan untuk slot ini
+        $bedBooked = Booking::where('id_waktu_boking', $waktuBoking->id)
+            ->where('id_bed', $bed->id)
+            ->whereNotIn('status_service', ['cancelled'])
+            ->exists();
+
+        if ($bedBooked) {
+            return back()->with('error', 'Bed ' . $bed->nama_bed . ' sudah terisi oleh pasien lain.');
         }
 
         // Cek kapasitas ruangan untuk slot ini
@@ -220,6 +325,7 @@ class BookingController extends Controller
             'id_service'      => $service->id,
             'id_waktu_boking' => $waktuBoking->id,
             'id_ruangan'      => $ruangan->id,
+            'id_bed'          => $bed->id,
             'date_booking'    => $tanggal,
             'time_booking'    => $jamBooking,
             'payment_method'  => $request->payment_method,

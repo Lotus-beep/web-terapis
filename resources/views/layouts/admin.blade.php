@@ -323,8 +323,11 @@
             <a href="{{ route('admin.service-categories.index') }}" class="nav-link {{ request()->routeIs('admin.service-categories.*') ? 'active' : '' }}">
                 <i class="bi bi-clipboard2-pulse"></i> Kategori Layanan
             </a>
-            <a href="{{ route('admin.locations.index') }}" class="nav-link {{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
-                <i class="bi bi-geo-alt"></i> Locations
+            <a href="{{ route('admin.ruangans.index') }}" class="nav-link {{ request()->routeIs('admin.ruangans.*') ? 'active' : '' }}">
+                <i class="bi bi-door-closed"></i> Ruangan
+            </a>
+            <a href="{{ route('admin.sessions.index') }}" class="nav-link {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i> Jadwal Sesi
             </a>
             <div class="nav-section">Transaksi</div>
             <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">

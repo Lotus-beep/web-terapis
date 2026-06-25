@@ -21,6 +21,7 @@ class Booking extends Model
         'id_service',
         'id_waktu_boking',
         'id_ruangan',
+        'id_bed',
         'status_service',
         'time_booking',
         'payment_proof',
@@ -64,9 +65,25 @@ class Booking extends Model
         return $this->belongsTo(\App\Models\Ruangan::class, 'id_ruangan');
     }
 
+    public function bed(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Bed::class, 'id_bed');
+    }
+
     public function service(): BelongsTo
     {
         return $this->belongsTo(\App\Models\ServiceCategory::class, 'id_service');
+    }
+
+    public function getFormattedTimeAttribute(): string
+    {
+        $time = \Carbon\Carbon::parse($this->time_booking)->format('H:i');
+        $ms = \App\Models\MasterSesi::where('jam_mulai', $time)->first();
+        if ($ms) {
+            $nama = $ms->nama_sesi ?: 'Sesi';
+            return "{$nama} ({$ms->jam_mulai} - {$ms->jam_selesai})";
+        }
+        return "{$time} WIB";
     }
 
     public function getStatusPaymentLabelAttribute(): string

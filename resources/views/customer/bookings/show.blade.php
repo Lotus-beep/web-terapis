@@ -82,13 +82,23 @@
                                 </td>
                             </tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Tanggal</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->date_booking)->isoFormat('dddd, D MMMM Y') }}</td></tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jam</td><td class="fw-bold">{{ \Carbon\Carbon::parse($booking->time_booking)->format('H:i') }} WIB</td></tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jam</td><td class="fw-bold">{{ $booking->formatted_time }}</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Ruangan</td>
                                 <td>
                                     @if($booking->ruangan)
                                         <i class="bi bi-door-open me-1" style="color:var(--green-mid);"></i>
                                         {{ $booking->ruangan->nama_ruangan }}
                                         <span style="font-size:.75rem;color:var(--text-muted);"> ({{ $booking->ruangan->gender_label }})</span>
+                                    @else
+                                        <span style="font-size:.8rem;color:var(--text-muted);">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Bed</td>
+                                <td>
+                                    @if($booking->bed)
+                                        <i class="bi bi-hospital me-1" style="color:var(--green-mid);"></i>
+                                        {{ $booking->bed->nama_bed }}
                                     @else
                                         <span style="font-size:.8rem;color:var(--text-muted);">-</span>
                                     @endif

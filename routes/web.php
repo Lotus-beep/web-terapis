@@ -26,6 +26,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // CRUD Locations
     Route::resource('locations', App\Http\Controllers\Admin\LocationController::class);
     
+    // CRUD Ruangans & Beds & Sessions
+    Route::resource('ruangans', App\Http\Controllers\Admin\RuanganController::class);
+    Route::resource('beds', App\Http\Controllers\Admin\BedController::class);
+    Route::resource('sessions', App\Http\Controllers\Admin\SessionController::class);
+    Route::post('sessions-holidays', [App\Http\Controllers\Admin\SessionController::class, 'storeHoliday'])->name('sessions.store-holiday');
+    Route::delete('sessions-holidays/{holiday}', [App\Http\Controllers\Admin\SessionController::class, 'destroyHoliday'])->name('sessions.destroy-holiday');
+    
     // Kelola Bookings
     Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class);
     Route::patch('bookings/{booking}/confirm-payment', [App\Http\Controllers\Admin\BookingController::class, 'confirmPayment'])->name('bookings.confirm-payment');
@@ -52,12 +59,13 @@ Route::prefix('customer')->name('customer.')->middleware(['auth', 'customer'])->
     Route::get('/services/{service}', [App\Http\Controllers\Customer\ServiceController::class, 'show'])->name('services.show');
 
     // Bookings
+    Route::get('/bookings/slots', [App\Http\Controllers\Customer\BookingController::class, 'getBookedSlots'])->name('bookings.slots');
+    Route::get('/bookings/ruangan', [App\Http\Controllers\Customer\BookingController::class, 'getRuangan'])->name('bookings.ruangan');
+    Route::get('/bookings/beds', [App\Http\Controllers\Customer\BookingController::class, 'getBeds'])->name('bookings.beds');
     Route::resource('bookings', App\Http\Controllers\Customer\BookingController::class);
     Route::patch('bookings/{booking}/cancel', [App\Http\Controllers\Customer\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('bookings/{booking}/payment', [App\Http\Controllers\Customer\BookingController::class, 'uploadPayment'])->name('bookings.payment');
     Route::post('bookings/{booking}/comment', [App\Http\Controllers\Customer\BookingController::class, 'storeComment'])->name('bookings.comment');
-    Route::get('/bookings/slots', [App\Http\Controllers\Customer\BookingController::class, 'getBookedSlots'])->name('bookings.slots');
-    Route::get('/bookings/ruangan', [App\Http\Controllers\Customer\BookingController::class, 'getRuangan'])->name('bookings.ruangan');
 
     // Profile
     Route::get('/profile', [App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('profile.edit');
