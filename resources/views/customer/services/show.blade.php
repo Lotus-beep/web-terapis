@@ -10,12 +10,36 @@
     </a>
 
     <div class="row g-4">
-        {{-- Gambar Layanan --}}
+        {{-- Galeri Gambar --}}
         <div class="col-lg-5">
-            <div style="border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md);">
-                <img src="{{ asset($service->display_image) }}" alt="{{ $service->name }}"
-                    style="width:100%;height:340px;object-fit:cover;">
-            </div>
+            @php $images = $service->images; @endphp
+
+            @if($images->count())
+                {{-- Gambar Utama --}}
+                <div style="border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:10px;">
+                    <img id="mainImg"
+                        src="{{ asset('storage/' . $images->first()->path) }}"
+                        alt="{{ $service->name }}"
+                        style="width:100%;height:340px;object-fit:cover;">
+                </div>
+                {{-- Thumbnail Gallery (jika > 1 foto) --}}
+                @if($images->count() > 1)
+                <div class="thumb-row">
+                    @foreach($images as $img)
+                    <div class="thumb-item {{ $loop->first ? 'active' : '' }}"
+                         onclick="switchImg(this, '{{ asset('storage/'.$img->path) }}')">
+                        <img src="{{ asset('storage/' . $img->path) }}" alt="">
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            @else
+                {{-- Fallback foto default --}}
+                <div style="border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md);">
+                    <img src="{{ $service->display_image }}" alt="{{ $service->name }}"
+                        style="width:100%;height:340px;object-fit:cover;">
+                </div>
+            @endif
         </div>
 
         {{-- Detail --}}
@@ -25,11 +49,14 @@
 
                     {{-- Badge kategori + status --}}
                     <div class="d-flex align-items-center gap-2 mb-2">
-                        @if($service->icon)
-                        <span style="background:var(--green-light);color:var(--green-dark);font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:50px;">
-                            <i class="bi {{ $service->icon }} me-1"></i>{{ $service->name }}
+                        @php
+                            $catColor = $service->category === 'bekam' ? '#1b6b3a' : '#2563eb';
+                            $catIcon  = $service->category === 'bekam' ? 'bi-droplet-fill' : 'bi-activity';
+                        @endphp
+                        <span style="background:{{ $catColor }}15;color:{{ $catColor }};font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:50px;border:1px solid {{ $catColor }}30;">
+                            <i class="bi {{ $catIcon }} me-1"></i>{{ $service->category_label }}
                         </span>
-                        @endif
+
                         @if($service->is_active)
                             <span style="background:#e8f5ee;color:#1b6b3a;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:50px;">
                                 <i class="bi bi-circle-fill me-1" style="font-size:.45rem;"></i>Tersedia
@@ -48,7 +75,7 @@
 
                     {{-- Harga --}}
                     <div class="mb-3" style="font-size:1.6rem;font-weight:800;color:var(--green-dark);">
-                        @if($service->price)
+                        @if($service->price > 0)
                             Rp {{ number_format($service->price, 0, ',', '.') }}
                         @else
                             <span style="font-size:1rem;color:var(--text-muted);">Hubungi kami</span>
@@ -102,5 +129,37 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+.thumb-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.thumb-item {
+    width: 72px; height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: border-color .2s, transform .2s;
+    flex-shrink: 0;
+}
+.thumb-item:hover { transform: scale(1.05); }
+.thumb-item.active { border-color: var(--green-mid); }
+.thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+function switchImg(el, src) {
+    document.getElementById('mainImg').src = src;
+    document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+}
+</script>
+@endpush
 
 @endsection

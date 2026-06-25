@@ -34,7 +34,6 @@
                     <table class="table mb-0" style="font-size:.875rem;">
                         <tbody>
                             <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Layanan</td><td class="fw-bold">{{ $booking->service->name ?? '-' }}</td></tr>
-                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Jenis</td><td>{{ $booking->service->header_content ?? $booking->service->name ?? '-' }}</td></tr>
                             <tr>
                                 <td class="fw-600 text-muted ps-4" style="font-weight:600;">Pasien</td>
                                 <td>

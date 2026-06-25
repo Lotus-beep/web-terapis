@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::create('service_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');           // Nama kategori, contoh: "Bekam Umum"
-            $table->string('slug')->unique(); // Slug unik, contoh: "bekam-umum"
+            $table->string('name');           // Nama layanan, contoh: "Bekam Umum"
+            $table->string('slug')->unique(); // Slug unik
+            $table->string('category')->default('bekam'); // Kategori besar: bekam / non-bekam
+            $table->string('header_content')->nullable(); // Judul display layanan
             $table->text('description')->nullable();
-            $table->string('icon')->default('bi-heart-pulse-fill'); // Bootstrap icon class
-            $table->string('image')->nullable();  // Foto representasi kategori
+            $table->string('icon')->default('bi-heart-pulse-fill');
+            $table->string('image')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->integer('sort_order')->default(0); // Urutan tampil
+            $table->integer('sort_order')->default(0);
             $table->decimal('price', 10, 2)->default(0.00);
             $table->timestamps();
         });

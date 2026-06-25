@@ -937,11 +937,7 @@
                                 alt="{{ $service->name }}"
                                 style="width:100%;height:100%;object-fit:cover;transition:transform .45s;">
                             <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(27,107,58,.55),transparent 55%);"></div>
-                            @if($service->icon)
-                                <span style="position:absolute;top:10px;left:10px;background:var(--green-dark);color:white;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:50px;">
-                                    <i class="bi {{ $service->icon }} me-1"></i>{{ $service->name }}
-                                </span>
-                            @endif
+
                             <span style="position:absolute;bottom:10px;left:12px;color:white;font-weight:800;font-size:.95rem;text-shadow:0 1px 4px rgba(0,0,0,.4);">
                                 Rp {{ number_format($service->price, 0, ',', '.') }}
                             </span>

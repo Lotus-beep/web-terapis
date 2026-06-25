@@ -103,12 +103,24 @@ class BookingTest extends TestCase
     {
         $customer = User::where('role_users', 'customer')->first();
         if (!$customer) {
-            $customer = User::factory()->create(['role_users' => 'customer']);
+            $customer = User::factory()->create(['role_users' => 'customer', 'gender' => 'laki-laki']);
+        } elseif (!$customer->gender) {
+            $customer->gender = 'laki-laki';
+            $customer->save();
         }
 
         $service = ServiceCategory::first();
+        if (!$service) {
+            $service = ServiceCategory::create(['name' => 'Bekam', 'slug' => 'bekam', 'price' => 150000]);
+        }
         $room = Ruangan::where('active', true)->where('gender', $customer->gender)->first();
+        if (!$room) {
+            $room = Ruangan::create(['nama_ruangan' => 'Test Room C', 'gender' => 'laki-laki', 'maximal' => 3, 'active' => true]);
+        }
         $bed = Bed::where('id_ruangan', $room->id)->where('active', true)->first();
+        if (!$bed) {
+            $bed = Bed::create(['id_ruangan' => $room->id, 'nama_bed' => 'Bed Z', 'active' => true]);
+        }
 
         // Create a custom master session
         $masterSession = MasterSesi::updateOrCreate(

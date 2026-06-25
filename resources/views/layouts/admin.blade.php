@@ -321,7 +321,7 @@
                 <i class="bi bi-person-badge"></i> Terapis
             </a>
             <a href="{{ route('admin.service-categories.index') }}" class="nav-link {{ request()->routeIs('admin.service-categories.*') ? 'active' : '' }}">
-                <i class="bi bi-clipboard2-pulse"></i> Kategori Layanan
+                <i class="bi bi-clipboard2-pulse"></i> Layanan
             </a>
             <a href="{{ route('admin.ruangans.index') }}" class="nav-link {{ request()->routeIs('admin.ruangans.*') ? 'active' : '' }}">
                 <i class="bi bi-door-closed"></i> Ruangan

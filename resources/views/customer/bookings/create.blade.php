@@ -16,7 +16,6 @@
                 style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;">
             <div>
                 <div class="fw-bold" style="color:var(--green-dark);">{{ $service->header_content ?: $service->name }}</div>
-                <div style="font-size:.8rem;color:var(--text-muted);">{{ $service->name }}</div>
                 <div class="fw-bold mt-1" style="color:var(--green-dark);">Rp {{ number_format($service->price, 0, ',', '.') }}</div>
             </div>
             <div class="ms-auto text-end d-none d-sm-block">

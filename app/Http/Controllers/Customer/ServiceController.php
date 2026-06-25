@@ -10,16 +10,20 @@ class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ServiceCategory::where('is_active', true);
+        $filter = $request->query('kategori'); // 'bekam', 'non-bekam', atau null (semua)
 
-        if ($request->category) {
-            $query->where('id', $request->category);
+        $query = ServiceCategory::where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('sort_order')
+            ->orderBy('name');
+
+        if ($filter && in_array($filter, ['bekam', 'non-bekam'])) {
+            $query->where('category', $filter);
         }
 
-        $services   = $query->orderBy('sort_order')->orderBy('name')->paginate(9);
-        $categories = ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
+        $services = $query->get();
 
-        return view('customer.services.index', compact('services', 'categories'));
+        return view('customer.services.index', compact('services', 'filter'));
     }
 
     public function show(ServiceCategory $service)

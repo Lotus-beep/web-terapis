@@ -22,6 +22,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // CRUD Service Categories
     Route::resource('service-categories', App\Http\Controllers\Admin\ServiceCategoryController::class);
+    Route::delete('service-images/{image}', [App\Http\Controllers\Admin\ServiceCategoryController::class, 'deleteImage'])->name('service-images.destroy');
     
     // CRUD Locations
     Route::resource('locations', App\Http\Controllers\Admin\LocationController::class);

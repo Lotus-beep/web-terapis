@@ -13,6 +13,7 @@ class ServiceCategory extends Model
     protected $fillable = [
         'name',
         'slug',
+        'category',
         'header_content',
         'description',
         'icon',
@@ -30,17 +31,31 @@ class ServiceCategory extends Model
     // Auto-generate slug dari name saat create
     protected static function booted(): void
     {
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
+        static::creating(function ($model) {
+            if (empty($model->slug)) {
+                $model->slug = Str::slug($model->name);
             }
         });
 
-        static::updating(function ($category) {
-            if ($category->isDirty('name') && !$category->isDirty('slug')) {
-                $category->slug = Str::slug($category->name);
+        static::updating(function ($model) {
+            if ($model->isDirty('name') && !$model->isDirty('slug')) {
+                $model->slug = Str::slug($model->name);
             }
         });
+    }
+
+    // Relasi ke galeri foto
+    public function images(): HasMany
+    {
+        return $this->hasMany(ServiceImage::class, 'service_category_id')
+                    ->orderBy('sort_order')
+                    ->orderBy('id');
+    }
+
+    public function primaryImage(): ?ServiceImage
+    {
+        return $this->images()->where('is_primary', true)->first()
+            ?? $this->images()->first();
     }
 
     public function bookings(): HasMany
@@ -48,23 +63,53 @@ class ServiceCategory extends Model
         return $this->hasMany(\App\Models\Booking::class, 'id_service');
     }
 
-    // Gambar: pakai upload jika ada, fallback ke default per slug
+    // Accessor name_service untuk kompatibilitas view booking
+    public function getNameServiceAttribute(): string
+    {
+        return $this->name;
+    }
+
+    // Label kategori
+    public function getCategoryLabelAttribute(): string
+    {
+        return match($this->category) {
+            'bekam'     => 'Bekam',
+            'non-bekam' => 'Non Bekam',
+            default     => 'Lainnya',
+        };
+    }
+
+    // Warna badge kategori
+    public function getCategoryColorAttribute(): string
+    {
+        return match($this->category) {
+            'bekam'     => '#1b6b3a',
+            'non-bekam' => '#2563eb',
+            default     => '#6b7280',
+        };
+    }
+
+    /**
+     * Gambar utama untuk ditampilkan di card.
+     * Prioritas: foto upload pertama → foto default per kategori
+     */
     public function getDisplayImageAttribute(): string
     {
-        if ($this->image) {
-            return 'storage/' . $this->image;
+        // Coba ambil dari galeri
+        $primary = $this->images()->first();
+        if ($primary) {
+            return asset('storage/' . $primary->path);
         }
 
-        // Default images berdasarkan slug
-        $defaults = [
-            'bekam-umum'          => 'image/Bekam Foto.jpeg',
-            'fashdu'              => 'image/Tempat Bekam 2.jpeg',
-            'gurah'               => 'image/Rumah Bekam 3.jpeg',
-            'akupuntur'           => 'image/jenis Layanan.png',
-            'pijat-syaraf-kejepit'=> 'image/tempat Bekam.jpeg',
-            'pijat-bayi-anak'     => 'image/Layanan Pijat Bayi & Anak.jpeg',
-        ];
+        // Fallback: kolom image lama (jika ada)
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
 
-        return $defaults[$this->slug] ?? 'image/Bekam Foto.jpeg';
+        // Default per kategori
+        return asset($this->category === 'bekam'
+            ? 'image/Bekam Foto.jpeg'
+            : 'image/Tempat Bekam 2.jpeg'
+        );
     }
 }
