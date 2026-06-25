@@ -221,6 +221,20 @@
                                         </button>
                                     </form>
                                 </div>
+                            @elseif($booking->status_payment === 'unpaid' && $booking->payment_method === 'cash' && $booking->status_service !== 'cancelled')
+                                <div class="mt-2">
+                                    <div class="alert py-2 px-3 mb-2" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:.82rem;color:#78350f;">
+                                        <i class="bi bi-cash-coin me-1"></i>
+                                        Pembayaran <strong>Cash</strong> — konfirmasi setelah menerima uang dari pasien.
+                                    </div>
+                                    <form method="POST" action="{{ route('admin.bookings.confirm-payment', $booking->id) }}">
+                                        @csrf @method('PATCH')
+                                        <button class="btn btn-sm btn-success w-100"
+                                            onclick="return confirm('Konfirmasi bahwa pembayaran cash sudah diterima?')">
+                                            <i class="bi bi-cash-stack me-1"></i>Konfirmasi Terima Pembayaran Cash
+                                        </button>
+                                    </form>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -238,6 +252,23 @@
             <div class="card-body text-center">
                 <img src="{{ asset('storage/'.$booking->payment_proof) }}"
                     class="img-fluid rounded" style="max-height:300px" alt="Bukti Pembayaran">
+            </div>
+        </div>
+        @elseif($booking->payment_method === 'cash')
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width:44px;height:44px;background:#fef3c7;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-cash-stack" style="font-size:1.3rem;color:#d97706;"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="font-size:.9rem;">Pembayaran Cash</div>
+                        <div class="text-muted" style="font-size:.78rem;">Tidak ada bukti upload</div>
+                    </div>
+                </div>
+                <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:0;">
+                    Pasien membayar langsung ke admin. Konfirmasi pembayaran setelah menerima uang menggunakan tombol di panel Status Pembayaran.
+                </p>
             </div>
         </div>
         @else

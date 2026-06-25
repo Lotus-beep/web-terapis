@@ -42,6 +42,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Lihat Comments
     Route::get('comments', [App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');
+
+    // Pengaturan Klinik (Alamat & Maps)
+    Route::get('clinic-settings', [App\Http\Controllers\Admin\ClinicSettingController::class, 'edit'])->name('clinic-settings.edit');
+    Route::put('clinic-settings', [App\Http\Controllers\Admin\ClinicSettingController::class, 'update'])->name('clinic-settings.update');
 });
 
 // Midtrans Webhook (no auth needed)

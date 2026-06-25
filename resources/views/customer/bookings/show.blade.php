@@ -185,27 +185,31 @@
                 </div>
             @endif
 
-            {{-- Cash Upload Bukti --}}
+            {{-- Cash: Info bayar langsung ke admin --}}
             @if($booking->payment_method === 'cash' && $booking->status_payment === 'unpaid' && $booking->status_service !== 'cancelled')
             <div class="card mb-4" style="border:2px solid var(--yellow-main);">
-                <div class="card-header" style="background:var(--yellow-soft);border-color:var(--yellow-main);">
-                    <h6 class="fw-bold mb-0" style="color:#7a5700;"><i class="bi bi-upload me-2"></i>Upload Bukti Pembayaran Cash</h6>
+                <div class="card-header d-flex align-items-center gap-2" style="background:var(--yellow-soft);border-color:var(--yellow-main);">
+                    <i class="bi bi-cash-coin" style="color:#7a5700;font-size:1.1rem;"></i>
+                    <h6 class="fw-bold mb-0" style="color:#7a5700;">Pembayaran Cash</h6>
                 </div>
                 <div class="card-body p-4">
-                    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:16px;">
-                        Setelah melakukan pembayaran, upload foto/screenshot bukti transfer atau nota pembayaran.
-                    </p>
-                    <form method="POST" action="{{ route('customer.bookings.payment', $booking->id) }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label">Bukti Pembayaran <span style="color:var(--red-main)">*</span></label>
-                            <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
-                            <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">Format: JPG, JPEG, PNG. Maks 2MB</div>
+                    <div class="d-flex align-items-start gap-3">
+                        <div style="width:48px;height:48px;background:#fef3c7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-cash-stack" style="font-size:1.4rem;color:#d97706;"></i>
                         </div>
-                        <button type="submit" class="btn btn-warning w-100" style="border-radius:8px;font-weight:700;">
-                            <i class="bi bi-upload me-2"></i>Upload Bukti
-                        </button>
-                    </form>
+                        <div>
+                            <p class="fw-semibold mb-1" style="color:#7a5700;">Bayar Langsung ke Admin</p>
+                            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:8px;">
+                                Serahkan pembayaran sebesar
+                                <strong style="color:var(--green-dark);">Rp {{ number_format($booking->service->price ?? 0, 0, ',', '.') }}</strong>
+                                langsung ke admin/kasir klinik saat datang.
+                            </p>
+                            <div style="font-size:.8rem;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;color:#78350f;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Admin akan mengkonfirmasi pembayaran Anda di sistem setelah menerima uang.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @endif
