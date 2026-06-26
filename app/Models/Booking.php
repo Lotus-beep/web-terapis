@@ -31,6 +31,7 @@ class Booking extends Model
         'booking_for',
         'second_username',
         'gender_second',
+        'keluhan',
     ];
 
     protected function casts(): array
@@ -73,6 +74,16 @@ class Booking extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(\App\Models\ServiceCategory::class, 'id_service');
+    }
+
+    public function therapyReport()
+    {
+        return $this->hasOne(TherapyReport::class, 'booking_id');
+    }
+
+    public function getKodeBookingAttribute(): string
+    {
+        return 'BKM-' . str_pad($this->id, 4, '0', STR_PAD_LEFT);
     }
 
     public function getFormattedTimeAttribute(): string

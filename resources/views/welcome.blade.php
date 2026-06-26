@@ -160,6 +160,32 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        {{-- LOKASI KLINIK SECTION --}}
+                        @php
+                            $clinicAddress = \App\Models\ClinicSetting::getValue('clinic_address', 'Alamat belum diatur.');
+                            $mapsEmbedUrl = \App\Models\ClinicSetting::getValue('maps_embed_url');
+                            $mapsLink = \App\Models\ClinicSetting::getValue('maps_link');
+                        @endphp
+                        <div class="mt-8 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] dark:bg-zinc-900 dark:ring-zinc-800">
+                            <h2 class="text-xl font-semibold text-black dark:text-white mb-4">
+                                <svg class="inline-block size-6 mr-2 stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                                Lokasi Klinik
+                            </h2>
+                            <p class="text-sm/relaxed mb-4 text-black/70 dark:text-white/70">
+                                {{ $clinicAddress }}
+                            </p>
+                            @if($mapsEmbedUrl)
+                                <div class="w-full overflow-hidden rounded-lg mb-4">
+                                    <iframe src="{{ $mapsEmbedUrl }}" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
+                            @endif
+                            @if($mapsLink)
+                                <a href="{{ $mapsLink }}" target="_blank" class="inline-flex items-center justify-center rounded-md border border-transparent bg-[#FF2D20] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#e02418] focus:outline-none focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 w-full sm:w-auto">
+                                    Buka di Google Maps
+                                </a>
+                            @endif
+                        </div>
                     </main>
 
                     <footer class="py-16 text-center text-sm text-black dark:text-white/70">

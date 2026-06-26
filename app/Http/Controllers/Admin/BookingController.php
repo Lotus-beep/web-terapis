@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    use \App\Traits\ExportWordReport;
+
+    public function exportWord(Booking $booking)
+    {
+        return $this->generateWordReport($booking);
+    }
+
     public function index(Request $request)
     {
         $query = Booking::with(['customer', 'terapis', 'service']);
@@ -25,7 +32,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        $booking->load(['customer', 'terapis', 'location', 'service', 'ruangan', 'bed']);
+        $booking->load(['customer', 'terapis', 'location', 'service', 'ruangan', 'bed', 'therapyReport']);
         $terapisList  = Terapis::orderBy('username')->get();
         $locationList = Location::orderBy('name_location')->get();
         return view('admin.bookings.show', compact('booking', 'terapisList', 'locationList'));

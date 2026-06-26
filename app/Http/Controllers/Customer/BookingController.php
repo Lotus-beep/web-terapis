@@ -16,6 +16,14 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    use \App\Traits\ExportWordReport;
+
+    public function exportWord(Booking $booking)
+    {
+        if ($booking->id_customer !== auth()->id()) abort(403);
+        return $this->generateWordReport($booking);
+    }
+
     public function index(Request $request)
     {
         $query = Booking::with(['terapis', 'service', 'waktuBoking.ruangan'])
@@ -23,6 +31,21 @@ class BookingController extends Controller
 
         if ($request->status_service) {
             $query->where('status_service', $request->status_service);
+        }
+
+        if ($request->time_filter) {
+            $now = \Carbon\Carbon::now();
+            if ($request->time_filter === 'today') {
+                $query->whereDate('date_booking', $now->toDateString());
+            } elseif ($request->time_filter === 'this_week') {
+                $query->whereBetween('date_booking', [
+                    $now->copy()->startOfWeek()->toDateString(),
+                    $now->copy()->endOfWeek()->toDateString()
+                ]);
+            } elseif ($request->time_filter === 'this_month') {
+                $query->whereMonth('date_booking', $now->month)
+                      ->whereYear('date_booking', $now->year);
+            }
         }
 
         $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
@@ -264,6 +287,7 @@ class BookingController extends Controller
             'booking_for'      => 'required|in:self,other',
             'second_username'  => 'required_if:booking_for,other|nullable|string|max:100',
             'gender_second'    => 'required_if:booking_for,other|nullable|in:laki-laki,perempuan',
+            'keluhan'          => 'required|string',
         ]);
 
         $service     = ServiceCategory::findOrFail($request->id_service);
@@ -334,6 +358,7 @@ class BookingController extends Controller
             'booking_for'     => $request->booking_for,
             'second_username' => $request->booking_for === 'other' ? $request->second_username : null,
             'gender_second'   => $request->booking_for === 'other' ? $request->gender_second : null,
+            'keluhan'         => $request->keluhan,
         ]);
 
         if ($request->payment_method === 'online') {
@@ -364,9 +389,8 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $booking->load(['terapis', 'service', 'waktuBoking.ruangan', 'location']);
-        $hasComment = Comment::where('id_customer', auth()->id())
-            ->where('id_terapis', $booking->id_terapis)->exists();
+        $booking->load(['terapis', 'service', 'waktuBoking.ruangan', 'location', 'therapyReport']);
+        $hasComment = Comment::where('id_booking', $booking->id)->exists();
 
         $snapToken = session('snap_token');
         $clientKey = session('client_key', config('midtrans.client_key'));
@@ -477,27 +501,23 @@ class BookingController extends Controller
         }
 
         $request->validate([
-            'rating'  => 'required|integer|between:1,5',
             'comment' => 'required|string|max:500',
         ]);
 
-        $existing = Comment::where('id_customer', auth()->id())
-            ->where('id_terapis', $booking->id_terapis)->first();
+        $existing = Comment::where('id_booking', $booking->id)->first();
 
         if ($existing) {
-            return back()->with('error', 'Anda sudah memberikan komentar untuk terapis ini.');
+            return back()->with('error', 'Anda sudah memberikan ulasan untuk pesanan ini.');
         }
 
         Comment::create([
             'id_customer' => auth()->id(),
             'id_terapis'  => $booking->id_terapis,
-            'rating'      => $request->rating,
+            'id_booking'  => $booking->id,
+            'rating'      => 0, // Default since rating feature is removed
             'comment'     => $request->comment,
         ]);
 
-        $avgRating = Comment::where('id_terapis', $booking->id_terapis)->avg('rating');
-        Terapis::where('id', $booking->id_terapis)->update(['rating' => round($avgRating, 2)]);
-
-        return back()->with('success', 'Terima kasih atas rating dan komentar Anda!');
+        return back()->with('success', 'Terima kasih atas ulasan Anda!');
     }
 }

@@ -71,6 +71,39 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $clinicName = \App\Models\ClinicSetting::getValue('clinic_name', 'Klinik Bekam');
+                $clinicPhone = \App\Models\ClinicSetting::getValue('clinic_phone', '-');
+                $clinicHours = \App\Models\ClinicSetting::getValue('clinic_hours', '-');
+            @endphp
+            <div class="card mt-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded p-3 me-3">
+                            <i class="bi bi-info-circle fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Pusat Informasi {{ $clinicName }}</h6>
+                            <p class="text-muted small mb-0">Hubungi kami jika Anda memiliki pertanyaan atau butuh bantuan lebih lanjut.</p>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border border-opacity-50 rounded p-3 bg-light">
+                                <div class="text-muted small mb-1"><i class="bi bi-telephone-fill text-success me-2"></i>Nomor WhatsApp / Telepon</div>
+                                <div class="fw-semibold">{{ $clinicPhone }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border border-opacity-50 rounded p-3 bg-light">
+                                <div class="text-muted small mb-1"><i class="bi bi-clock-fill text-warning me-2"></i>Jam Operasional Klinik</div>
+                                <div class="fw-semibold">{{ $clinicHours }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="card">
@@ -81,6 +114,30 @@
                     <a href="{{ route('customer.services.index') }}" class="btn btn-primary w-100">
                         <i class="bi bi-search me-2"></i>Lihat Layanan
                     </a>
+                </div>
+            </div>
+
+            @php
+                $clinicAddress = \App\Models\ClinicSetting::getValue('clinic_address', 'Alamat belum diatur.');
+                $mapsEmbedUrl = \App\Models\ClinicSetting::getValue('maps_embed_url');
+                $mapsLink = \App\Models\ClinicSetting::getValue('maps_link');
+            @endphp
+            <div class="card mt-4">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Lokasi Klinik</h6>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <p class="text-muted small mb-3">{{ $clinicAddress }}</p>
+                    @if($mapsEmbedUrl)
+                    <div class="overflow-hidden rounded mb-3" style="height: 200px;">
+                        <iframe src="{{ $mapsEmbedUrl }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                    @endif
+                    @if($mapsLink)
+                    <a href="{{ $mapsLink }}" target="_blank" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-map me-2"></i>Buka di Google Maps
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>

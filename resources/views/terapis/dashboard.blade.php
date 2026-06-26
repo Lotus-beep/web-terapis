@@ -8,7 +8,7 @@
 </div>
 
 <div class="row g-4 mb-4">
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <div class="card text-white" style="background:linear-gradient(135deg,#1a5276,#2980b9)">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <div class="card text-white" style="background:linear-gradient(135deg,#7d3c98,#9b59b6)">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
@@ -27,17 +27,6 @@
                     <div class="fs-2 fw-bold">{{ $monthBookings }}</div>
                 </div>
                 <i class="bi bi-calendar-month fs-1 opacity-50"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-4">
-        <div class="card text-white" style="background:linear-gradient(135deg,#b7950b,#f39c12)">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="small opacity-75">Rating Rata-rata</div>
-                    <div class="fs-2 fw-bold">{{ number_format($avgRating, 1) }}</div>
-                </div>
-                <i class="bi bi-star-fill fs-1 opacity-50"></i>
             </div>
         </div>
     </div>

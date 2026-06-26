@@ -15,9 +15,15 @@ class Comment extends Model
     protected $fillable = [
         'id_customer',
         'id_terapis',
+        'id_booking',
         'rating',
         'comment',
     ];
+
+    public function booking(): BelongsTo
+    {
+        return $this->belongsTo(Booking::class, 'id_booking');
+    }
 
     public function customer(): BelongsTo
     {

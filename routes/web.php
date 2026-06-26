@@ -13,6 +13,10 @@ require __DIR__.'/auth.php';
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
+    // Profile Admin
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    
     // CRUD Users
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
     
@@ -35,6 +39,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('sessions-holidays/{holiday}', [App\Http\Controllers\Admin\SessionController::class, 'destroyHoliday'])->name('sessions.destroy-holiday');
     
     // Kelola Bookings
+    Route::get('bookings/{booking}/export-word', [App\Http\Controllers\Admin\BookingController::class, 'exportWord'])->name('bookings.export-word');
     Route::resource('bookings', App\Http\Controllers\Admin\BookingController::class);
     Route::patch('bookings/{booking}/confirm-payment', [App\Http\Controllers\Admin\BookingController::class, 'confirmPayment'])->name('bookings.confirm-payment');
     Route::patch('bookings/{booking}/reject-payment', [App\Http\Controllers\Admin\BookingController::class, 'rejectPayment'])->name('bookings.reject-payment');
@@ -68,6 +73,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth', 'customer'])->
     Route::get('/bookings/ruangan', [App\Http\Controllers\Customer\BookingController::class, 'getRuangan'])->name('bookings.ruangan');
     Route::get('/bookings/beds', [App\Http\Controllers\Customer\BookingController::class, 'getBeds'])->name('bookings.beds');
     Route::resource('bookings', App\Http\Controllers\Customer\BookingController::class);
+    Route::get('/bookings/{booking}/export-word', [App\Http\Controllers\Customer\BookingController::class, 'exportWord'])->name('bookings.export-word');
     Route::patch('bookings/{booking}/cancel', [App\Http\Controllers\Customer\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('bookings/{booking}/payment', [App\Http\Controllers\Customer\BookingController::class, 'uploadPayment'])->name('bookings.payment');
     Route::post('bookings/{booking}/comment', [App\Http\Controllers\Customer\BookingController::class, 'storeComment'])->name('bookings.comment');
@@ -86,6 +92,11 @@ Route::prefix('terapis')->name('terapis.')->middleware(['auth', 'terapis'])->gro
     Route::patch('/bookings/{booking}/confirm', [App\Http\Controllers\Terapis\BookingController::class, 'confirm'])->name('bookings.confirm');
     Route::patch('/bookings/{booking}/update-status', [App\Http\Controllers\Terapis\BookingController::class, 'updateStatus'])->name('bookings.update-status');
     
+    // Report
+    Route::get('/bookings/{booking}/report', [App\Http\Controllers\Terapis\BookingController::class, 'report'])->name('bookings.report');
+    Route::post('/bookings/{booking}/report', [App\Http\Controllers\Terapis\BookingController::class, 'storeReport'])->name('bookings.store-report');
+    Route::get('/bookings/{booking}/export-word', [App\Http\Controllers\Terapis\BookingController::class, 'exportWord'])->name('bookings.export-word');
+
     // Schedule
     Route::get('/schedule', [App\Http\Controllers\Terapis\BookingController::class, 'schedule'])->name('schedule');
     

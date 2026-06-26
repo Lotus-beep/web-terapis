@@ -1,4 +1,4 @@
-@extends('layouts.terapis')
+@extends('layouts.admin')
 @section('title','Edit Profil')
 @section('page-title','Edit Profil')
 @section('content')
@@ -9,7 +9,7 @@
                 @if($errors->any())
                     <div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
                 @endif
-                <form method="POST" action="{{ route('terapis.profile.update') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data">
                     @csrf @method('PATCH')
                     
                     <div class="text-center mb-4">
@@ -31,25 +31,21 @@
                         <div class="small text-muted mt-1">Format: JPG, PNG, GIF (Max 2MB)</div>
                     </div>
 
-                    <h6 class="fw-bold mb-3 text-muted">Informasi Profil</h6>
+                    <h6 class="fw-bold mb-3 text-muted">Informasi Akun</h6>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama</label>
+                        <label class="form-label fw-semibold">Username</label>
                         <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control" value="{{ $user->email }}" disabled>
-                        <div class="form-text">Email tidak bisa diubah</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">No. Telepon</label>
-                        <input type="text" name="no_telepon" class="form-control" value="{{ old('no_telepon', $user->no_telepon) }}">
-                    </div>
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Alamat</label>
-                        <textarea name="alamat" class="form-control" rows="3">{{ old('alamat', $user->alamat) }}</textarea>
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                     </div>
+
                     <h6 class="fw-bold mb-3 text-muted border-top pt-3">Ganti Password <span class="text-muted fw-normal small">(opsional)</span></h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password Lama</label>
+                        <input type="password" name="current_password" class="form-control" placeholder="Masukkan password lama jika ingin mengganti">
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Password Baru</label>
                         <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter">
@@ -58,6 +54,7 @@
                         <label class="form-label fw-semibold">Konfirmasi Password Baru</label>
                         <input type="password" name="password_confirmation" class="form-control">
                     </div>
+
                     <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Simpan Perubahan</button>
                 </form>
             </div>

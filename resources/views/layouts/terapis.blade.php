@@ -230,7 +230,7 @@
                 <i class="bi bi-calendar3"></i> Jadwal
             </a>
             <a href="{{ route('terapis.ratings') }}" class="nav-link {{ request()->routeIs('terapis.ratings') ? 'active' : '' }}">
-                <i class="bi bi-star"></i> Rating & Komentar
+                <i class="bi bi-chat-text"></i> Ulasan Pelanggan
             </a>
             <div class="nav-section">Akun</div>
             <a href="{{ route('terapis.profile.edit') }}" class="nav-link {{ request()->routeIs('terapis.profile.*') ? 'active' : '' }}">
@@ -248,7 +248,11 @@
                 <span class="page-title">@yield('page-title', 'Dashboard')</span>
             </div>
             <div class="user-info">
-                <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
+                @if(auth()->user()->photo)
+                    <img src="{{ asset('storage/' . auth()->user()->photo) }}" class="rounded-circle object-fit-cover" width="35" height="35" alt="Avatar">
+                @else
+                    <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
+                @endif
                 <span>{{ auth()->user()->username }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline">
                     @csrf

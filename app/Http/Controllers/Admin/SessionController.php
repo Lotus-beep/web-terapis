@@ -110,16 +110,25 @@ class SessionController extends Controller
     public function storeHoliday(Request $request)
     {
         $request->validate([
-            'tanggal' => 'required|date|unique:waktu_layanan,tanggal',
+            'tanggal' => 'required|date',
         ]);
 
-        WaktuLayanan::create([
-            'tanggal'     => $request->tanggal,
-            'waktu_buka'  => '08:00',
-            'waktu_tutup' => '21:00',
-            'maximal'     => 10,
-            'active'      => false, // false denotes closed/holiday
-        ]);
+        $waktuLayanan = WaktuLayanan::where('tanggal', $request->tanggal)->first();
+
+        if ($waktuLayanan) {
+            if (!$waktuLayanan->active) {
+                return redirect()->route('admin.sessions.index')->with('info', 'Tanggal tersebut sudah ditandai sebagai hari libur.');
+            }
+            $waktuLayanan->update(['active' => false]);
+        } else {
+            WaktuLayanan::create([
+                'tanggal'     => $request->tanggal,
+                'waktu_buka'  => '08:00',
+                'waktu_tutup' => '21:00',
+                'maximal'     => 10,
+                'active'      => false, // false denotes closed/holiday
+            ]);
+        }
 
         return redirect()->route('admin.sessions.index')->with('success', 'Tanggal libur/tutup klinik berhasil ditambahkan.');
     }

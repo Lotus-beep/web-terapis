@@ -833,7 +833,7 @@
                         Rumah Bekam Salam Insani hadir dengan terapis berpengalaman, peralatan steril, dan suasana klinik yang nyaman. Kesehatan Anda adalah prioritas kami.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="{{ route('register') }}" class="btn btn-cta-white btn-lg">
+                        <a href="{{ route('login') }}" class="btn btn-cta-white btn-lg">
                             <i class="bi bi-calendar-check me-2"></i>Booking Sekarang
                         </a>
                         <a href="#kenali-layanan" class="btn btn-cta-outline btn-lg">
@@ -951,7 +951,7 @@
                             @endif
                             <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top:1px solid var(--border-soft);">
                                 <span class="fw-bold" style="color:var(--green-dark);font-size:.95rem;">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
-                                <a href="{{ route('register') }}" class="btn-booking btn btn-sm">
+                                <a href="{{ route('login') }}" class="btn-booking btn btn-sm">
                                     <i class="bi bi-calendar-check me-1"></i>Booking
                                 </a>
                             </div>
@@ -968,7 +968,7 @@
 
             @if($services->count() > 0)
             <div class="text-center mt-5 fade-up">
-                <a href="{{ route('register') }}" class="btn btn-booking btn-lg px-5">
+                <a href="{{ route('login') }}" class="btn btn-booking btn-lg px-5">
                     <i class="bi bi-arrow-right-circle me-2"></i>Lihat Semua Layanan
                 </a>
             </div>
@@ -1195,21 +1195,7 @@
                             <small style="opacity:.75;font-size:.78rem;">Terapis Bersertifikat</small>
                         </div>
                         <div class="terapis-card-body">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="rating-stars">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= floor($t->rating))
-                                            <i class="bi bi-star-fill"></i>
-                                        @elseif($i - 0.5 <= $t->rating)
-                                            <i class="bi bi-star-half"></i>
-                                        @else
-                                            <i class="bi bi-star"></i>
-                                        @endif
-                                    @endfor
-                                </div>
-                                <span class="fw-bold" style="color:var(--yellow-main);font-size:.9rem;">{{ number_format($t->rating, 1) }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2" style="font-size:.83rem;color:var(--text-muted);">
+                            <div class="d-flex align-items-center gap-2 mb-2" style="font-size:.83rem;color:var(--text-muted);">
                                 <i class="bi bi-telephone-fill" style="color:var(--green-mid);"></i>
                                 {{ $t->no_telepon }}
                             </div>

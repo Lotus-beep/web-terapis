@@ -24,7 +24,7 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Customer</th><th>Layanan</th><th>Tanggal</th><th>Waktu</th><th>Status</th><th>Bayar</th><th>Aksi</th></tr>
+                    <tr><th>#</th><th>Kode Booking</th><th>Customer</th><th>Layanan</th><th>Tanggal</th><th>Waktu</th><th>Status</th><th>Bayar</th><th>Aksi</th></tr>
                 </thead>
                 <tbody>
                     @forelse($bookings as $b)
@@ -34,6 +34,7 @@
                     @endphp
                     <tr>
                         <td>{{ $loop->iteration }}</td>
+                        <td><span class="badge bg-secondary">{{ $b->kode_booking }}</span></td>
                         <td>
                             <div class="fw-semibold">{{ $b->customer->username ?? '-' }}</div>
                             <div class="text-muted small">{{ $b->customer->no_telepon ?? '' }}</div>
@@ -62,10 +63,21 @@
                                     <button class="btn btn-sm btn-info" title="Selesai"><i class="bi bi-check-circle"></i></button>
                                 </form>
                             @endif
+
+                            @if(in_array($b->status_service, ['in_progress', 'completed']))
+                                <a href="{{ route('terapis.bookings.report', $b->id) }}" class="btn btn-sm btn-secondary" title="Isi Laporan">
+                                    <i class="bi bi-file-earmark-medical"></i>
+                                </a>
+                                @if($b->therapyReport)
+                                <a href="{{ route('terapis.bookings.export-word', $b->id) }}" class="btn btn-sm btn-outline-primary" title="Download Word">
+                                    <i class="bi bi-file-word"></i>
+                                </a>
+                                @endif
+                            @endif
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada booking</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">Belum ada booking</td></tr>
                     @endforelse
                 </tbody>
             </table>

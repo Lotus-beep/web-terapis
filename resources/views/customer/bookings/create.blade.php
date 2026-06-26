@@ -120,6 +120,13 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Form Keluhan --}}
+                        <div class="mt-4">
+                            <label class="form-label" style="font-size:.9rem;font-weight:700;">Keluhan / Tujuan Terapi <span style="color:var(--red-main)">*</span></label>
+                            <textarea name="keluhan" id="keluhanTextarea" class="form-control @error('keluhan') is-invalid @enderror" rows="3" placeholder="Contoh: Pegal di bahu, sering pusing, dll." required style="border-radius:10px;">{{ old('keluhan') }}</textarea>
+                            @error('keluhan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
                     </div>
                 </div>
 

@@ -21,9 +21,16 @@
         <div class="card mb-4">
             <div class="card-header bg-white border-0 pt-4 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0">Detail Booking #{{ $booking->id }}</h6>
-                <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Kembali
-                </a>
+                <div>
+                    @if($booking->therapyReport)
+                    <a href="{{ route('admin.bookings.export-word', $booking->id) }}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-file-word me-1"></i>Download Laporan (Word)
+                    </a>
+                    @endif
+                    <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Kembali
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -62,12 +69,14 @@
                         </div>
                     </div>
 
-                    {{-- Layanan --}}
+                    {{-- Layanan & Keluhan --}}
                     <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
+                        <div class="p-3 bg-light rounded h-100">
                             <div class="text-muted small mb-1">Layanan</div>
                             <div class="fw-semibold">{{ $booking->service->name ?? '-' }}</div>
-                            <div class="text-success fw-bold">Rp {{ number_format($booking->service->price ?? 0, 0, ',', '.') }}</div>
+                            <div class="text-success fw-bold mb-2">Rp {{ number_format($booking->service->price ?? 0, 0, ',', '.') }}</div>
+                            <div class="text-muted small mb-1">Keluhan</div>
+                            <div class="fw-semibold">{{ $booking->keluhan ?? '-' }}</div>
                         </div>
                     </div>
 
@@ -149,7 +158,6 @@
                                                     {{ $booking->id_terapis == $t->id ? 'selected' : '' }}>
                                                     {{ $t->username }}
                                                     @if($t->gender) ({{ ucfirst($t->gender) }}) @endif
-                                                    @if($t->rating) ★{{ number_format($t->rating, 1) }} @endif
                                                 </option>
                                             @endforeach
                                         </select>

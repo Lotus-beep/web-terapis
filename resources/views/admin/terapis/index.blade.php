@@ -19,7 +19,7 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Nama</th><th>Email</th><th>No. Telepon</th><th>Rating</th><th>Aksi</th></tr>
+                    <tr><th>#</th><th>Nama</th><th>Email</th><th>No. Telepon</th><th>Aksi</th></tr>
                 </thead>
                 <tbody>
                     @forelse($terapis as $t)
@@ -29,14 +29,6 @@
                         <td>{{ $t->email }}</td>
                         <td>{{ $t->no_telepon ?? '-' }}</td>
                         <td>
-                            <span class="text-warning">
-                                @for($i=1;$i<=5;$i++)
-                                    <i class="bi bi-star{{ $i <= round($t->rating) ? '-fill' : '' }}"></i>
-                                @endfor
-                            </span>
-                            <span class="ms-1 small text-muted">({{ number_format($t->rating,1) }})</span>
-                        </td>
-                        <td>
                             <a href="{{ route('admin.terapis.edit', $t->id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
                             <form method="POST" action="{{ route('admin.terapis.destroy', $t->id) }}" class="d-inline" onsubmit="return confirm('Hapus terapis ini?')">
                                 @csrf @method('DELETE')
@@ -45,7 +37,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center text-muted py-4">Tidak ada data terapis</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada data terapis</td></tr>
                     @endforelse
                 </tbody>
             </table>

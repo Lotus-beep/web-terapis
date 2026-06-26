@@ -11,7 +11,7 @@ class CommentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Comment::with(['customer', 'terapis']);
+        $query = Comment::with(['customer', 'terapis', 'booking']);
         if ($request->id_terapis) {
             $query->where('id_terapis', $request->id_terapis);
         }

@@ -10,8 +10,28 @@
                     @if($errors->any())
                         <div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
                     @endif
-                    <form method="POST" action="{{ route('customer.profile.update') }}">
+                    <form method="POST" action="{{ route('customer.profile.update') }}" enctype="multipart/form-data">
                         @csrf @method('PATCH')
+                        
+                        <div class="text-center mb-4">
+                            <div class="d-inline-block position-relative">
+                                @if($user->photo)
+                                    <img src="{{ asset('storage/' . $user->photo) }}" class="rounded-circle object-fit-cover" width="100" height="100" alt="Foto Profil">
+                                @else
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-secondary" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="mt-2">
+                                <label for="photo" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-camera me-1"></i> Ganti Foto
+                                </label>
+                                <input type="file" name="photo" id="photo" class="d-none" accept="image/*" onchange="this.form.submit()">
+                            </div>
+                            <div class="small text-muted mt-1">Format: JPG, PNG, GIF (Max 2MB)</div>
+                        </div>
+
                         <h6 class="fw-bold mb-3 text-muted">Informasi Akun</h6>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nama Lengkap</label>

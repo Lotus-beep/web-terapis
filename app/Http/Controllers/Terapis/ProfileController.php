@@ -20,14 +20,12 @@ class ProfileController extends Controller
         $terapisUser = $this->getTerapis();
         if (!$terapisUser) return redirect()->route('terapis.dashboard');
 
-        $comments = Comment::with('customer')
+        $comments = Comment::with(['customer', 'booking'])
             ->where('id_terapis', $terapisUser->id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $avgRating = Comment::where('id_terapis', $terapisUser->id)->avg('rating') ?? 0;
-
-        return view('terapis.ratings.index', compact('comments', 'avgRating', 'terapisUser'));
+        return view('terapis.ratings.index', compact('comments', 'terapisUser'));
     }
 
     public function edit()
@@ -45,6 +43,7 @@ class ProfileController extends Controller
             'no_telepon' => 'nullable|string|max:20',
             'alamat'     => 'nullable|string|max:500',
             'password'   => 'nullable|min:8|confirmed',
+            'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = [
@@ -52,6 +51,13 @@ class ProfileController extends Controller
             'no_telepon' => $request->no_telepon,
             'alamat'     => $request->alamat,
         ];
+        
+        if ($request->hasFile('photo')) {
+            if ($user->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('profile_photos', 'public');
+        }
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

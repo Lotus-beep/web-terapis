@@ -29,7 +29,7 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Customer</th><th>Layanan</th><th>Terapis</th><th>Tanggal</th><th>Status Service</th><th>Status Bayar</th><th>Aksi</th></tr>
+                    <tr><th>#</th><th>Kode Booking</th><th>Customer</th><th>Layanan</th><th>Terapis</th><th>Tanggal</th><th>Status Service</th><th>Status Bayar</th><th>Aksi</th></tr>
                 </thead>
                 <tbody>
                     @forelse($bookings as $b)
@@ -39,6 +39,7 @@
                     @endphp
                     <tr>
                         <td>{{ $loop->iteration }}</td>
+                        <td><span class="badge bg-secondary">{{ $b->kode_booking }}</span></td>
                         <td>{{ $b->customer->username ?? '-' }}</td>
                         <td>{{ $b->service->name_service ?? '-' }}</td>
                         <td>{{ $b->terapis->username ?? '-' }}</td>
@@ -54,7 +55,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data booking</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">Tidak ada data booking</td></tr>
                     @endforelse
                 </tbody>
             </table>

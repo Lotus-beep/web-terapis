@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    use \App\Traits\ExportWordReport;
+
+    public function exportWord(Booking $booking)
+    {
+        if ($booking->id_terapis !== $this->getTerapisId()) abort(403);
+        return $this->generateWordReport($booking);
+    }
+
     private function getTerapisId(): ?int
     {
         $t = Terapis::where('email', auth()->user()->email)->first();
@@ -18,7 +26,7 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $terapisId = $this->getTerapisId();
-        $query = Booking::with(['customer', 'service', 'ruangan', 'bed'])
+        $query = Booking::with(['customer', 'service', 'ruangan', 'bed', 'therapyReport'])
             ->where('id_terapis', $terapisId);
 
         if ($request->status_service) {
@@ -48,6 +56,41 @@ class BookingController extends Controller
         $request->validate(['status_service' => 'required|in:in_progress,completed']);
         $booking->update(['status_service' => $request->status_service]);
         return back()->with('success', 'Status berhasil diupdate.');
+    }
+
+    public function report(Booking $booking)
+    {
+        if ($booking->id_terapis !== $this->getTerapisId()) abort(403);
+        $booking->load('therapyReport');
+        return view('terapis.bookings.report', compact('booking'));
+    }
+
+    public function storeReport(Request $request, Booking $booking)
+    {
+        if ($booking->id_terapis !== $this->getTerapisId()) abort(403);
+        
+        $data = $request->validate([
+            'keluhan_sebelum' => 'nullable|string',
+            'tindakan_terapi' => 'nullable|string',
+            'tekanan_darah' => 'nullable|string',
+            'suhu_tubuh' => 'nullable|string',
+            'kondisi_umum' => 'nullable|string',
+            'area_keluhan' => 'nullable|string',
+            'hasil_setelah_terapi' => 'nullable|string',
+            'catatan_terapis' => 'nullable|string',
+            'saran_terapis' => 'nullable|string',
+        ]);
+
+        $data['tindakan_terapi'] = json_encode($data['tindakan_terapi'] ?? '');
+        $data['hasil_setelah_terapi'] = json_encode($data['hasil_setelah_terapi'] ?? '');
+
+        if ($booking->therapyReport) {
+            $booking->therapyReport->update($data);
+        } else {
+            $booking->therapyReport()->create($data);
+        }
+
+        return redirect()->route('terapis.bookings.index')->with('success', 'Laporan terapi berhasil disimpan.');
     }
 
     public function schedule(Request $request)

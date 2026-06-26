@@ -5,10 +5,12 @@
 <div class="py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Detail Booking #{{ $booking->id }}</h4>
-        <a href="{{ route('customer.bookings.index') }}" class="btn btn-sm"
-            style="background:var(--green-light);color:var(--green-dark);border:none;border-radius:8px;font-weight:600;">
-            <i class="bi bi-arrow-left me-1"></i>Kembali
-        </a>
+        <div>
+            <a href="{{ route('customer.bookings.index') }}" class="btn btn-sm"
+                style="background:var(--green-light);color:var(--green-dark);border:none;border-radius:8px;font-weight:600;">
+                <i class="bi bi-arrow-left me-1"></i>Kembali
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -33,6 +35,7 @@
                 <div class="card-body p-0">
                     <table class="table mb-0" style="font-size:.875rem;">
                         <tbody>
+                            <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Kode Booking</td><td class="fw-bold text-primary">{{ $booking->kode_booking }}</td></tr>
                             <tr><td class="fw-600 text-muted ps-4" style="width:40%;font-weight:600;">Layanan</td><td class="fw-bold">{{ $booking->service->name ?? '-' }}</td></tr>
                             <tr>
                                 <td class="fw-600 text-muted ps-4" style="font-weight:600;">Pasien</td>
@@ -119,6 +122,11 @@
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Harga</td>
                                 <td class="fw-bold" style="color:var(--green-dark);font-size:1rem;">
                                     Rp {{ number_format($booking->service->price ?? 0, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                            <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Keluhan</td>
+                                <td>
+                                    <span class="fw-bold">{{ $booking->keluhan ?? '-' }}</span>
                                 </td>
                             </tr>
                             <tr><td class="fw-600 text-muted ps-4" style="font-weight:600;">Status Booking</td>
@@ -225,38 +233,29 @@
             </div>
             @endif
 
-            {{-- Rating & Komentar --}}
+            {{-- Ulasan --}}
             @if($booking->status_service === 'completed' && !$hasComment)
             <div class="card" style="border:2px solid var(--green-mid);">
                 <div class="card-header" style="background:var(--green-light);border-color:var(--green-mid);">
-                    <h6 class="fw-bold mb-0" style="color:var(--green-dark);"><i class="bi bi-star-fill me-2" style="color:var(--yellow-main);"></i>Berikan Rating &amp; Komentar</h6>
+                    <h6 class="fw-bold mb-0" style="color:var(--green-dark);"><i class="bi bi-chat-text-fill me-2" style="color:var(--green-mid);"></i>Berikan Ulasan</h6>
                 </div>
                 <div class="card-body p-4">
                     <form method="POST" action="{{ route('customer.bookings.comment', $booking->id) }}">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label">Rating <span style="color:var(--red-main)">*</span></label>
-                            <div class="star-rating d-flex gap-2 flex-row-reverse justify-content-end">
-                                @for($i=5;$i>=1;$i--)
-                                    <input type="radio" name="rating" id="star{{$i}}" value="{{$i}}" class="d-none" {{ old('rating')==$i?'checked':'' }}>
-                                    <label for="star{{$i}}" style="font-size:1.8rem;color:#ddd;cursor:pointer;">★</label>
-                                @endfor
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Komentar <span style="color:var(--red-main)">*</span></label>
+                            <label class="form-label">Ulasan <span style="color:var(--red-main)">*</span></label>
                             <textarea name="comment" class="form-control" rows="3"
                                 placeholder="Bagikan pengalaman Anda..." required maxlength="500">{{ old('comment') }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-send me-2"></i>Kirim Komentar
+                            <i class="bi bi-send me-2"></i>Kirim Ulasan
                         </button>
                     </form>
                 </div>
             </div>
             @elseif($booking->status_service === 'completed' && $hasComment)
-            <div class="alert" style="background:var(--green-light);border:1px solid #b8dfc8;color:var(--green-dark);border-radius:10px;">
-                <i class="bi bi-check-circle-fill me-2"></i>Anda sudah memberikan rating untuk terapis ini.
+            <div class="alert alert-success d-flex align-items-center mb-0">
+                <i class="bi bi-check-circle-fill me-2"></i>Terimakasih atas ulasan anda.
             </div>
             @endif
         </div>
@@ -264,7 +263,7 @@
         <!-- Sidebar Actions -->
         <div class="col-lg-5">
             @if($booking->status_service === 'pending')
-            <div class="card" style="border:2px solid var(--red-main);">
+            <div class="card mb-4" style="border:2px solid var(--red-main);">
                 <div class="card-body text-center p-4">
                     <i class="bi bi-x-circle" style="font-size:2.5rem;color:var(--red-main);"></i>
                     <h6 class="fw-bold mt-3 mb-1">Batalkan Booking</h6>
@@ -281,15 +280,27 @@
                 </div>
             </div>
             @endif
+
+            @if(isset($booking->therapyReport))
+            <div class="card mb-4" style="border:2px solid #3b82f6;">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-file-earmark-word" style="font-size:2.5rem;color:#3b82f6;"></i>
+                    <h6 class="fw-bold mt-3 mb-1">Unduh Laporan Terapi</h6>
+                    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;">
+                        Laporan terapi Anda telah selesai dibuat dan siap untuk diunduh (format Word).
+                    </p>
+                    <a href="{{ route('customer.bookings.export-word', $booking->id) }}" class="btn btn-primary w-100" style="border-radius:8px;font-weight:700;background-color:#3b82f6;border-color:#3b82f6;">
+                        <i class="bi bi-download me-2"></i>Download Laporan
+                    </a>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
 
 @push('styles')
 <style>
-    .star-rating label:hover,
-    .star-rating label:hover ~ label,
-    .star-rating input:checked ~ label { color: var(--yellow-main); }
 </style>
 @endpush
 

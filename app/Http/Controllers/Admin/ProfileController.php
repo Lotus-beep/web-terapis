@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = auth()->user();
-        return view('customer.profile.edit', compact('user'));
+        return view('admin.profile.edit', compact('user'));
     }
 
     public function update(Request $request)
@@ -22,9 +22,6 @@ class ProfileController extends Controller
         $request->validate([
             'username'        => 'required|string|max:255',
             'email'           => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'no_telepon'      => 'nullable|string|max:20',
-            'alamat'          => 'nullable|string|max:500',
-            'gender'          => 'nullable|in:laki-laki,perempuan',
             'current_password'=> 'nullable|string',
             'password'        => 'nullable|min:8|confirmed',
             'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -39,9 +36,6 @@ class ProfileController extends Controller
         $data = [
             'username'   => $request->username,
             'email'      => $request->email,
-            'no_telepon' => $request->no_telepon,
-            'alamat'     => $request->alamat,
-            'gender'     => $request->gender,
         ];
 
         if ($request->hasFile('photo')) {
@@ -56,6 +50,6 @@ class ProfileController extends Controller
         }
 
         $user->update($data);
-        return back()->with('success', 'Profil berhasil diupdate.');
+        return back()->with('success', 'Profil Admin berhasil diupdate.');
     }
 }

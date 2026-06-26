@@ -314,6 +314,9 @@
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
             <div class="nav-section">Manajemen</div>
+            <a href="{{ route('admin.clinic-settings.edit') }}" class="nav-link {{ request()->routeIs('admin.clinic-settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i> Pengaturan Klinik
+            </a>
             <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Users
             </a>
@@ -348,15 +351,31 @@
                 </button>
                 <span class="page-title">@yield('page-title', 'Dashboard')</span>
             </div>
-            <div class="user-info">
-                <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
-                <span>{{ auth()->user()->username }}</span>
-                <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-logout">
-                        <i class="bi bi-box-arrow-right me-1"></i>Logout
-                    </button>
-                </form>
+            <div class="user-info dropdown">
+                <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-dark dropdown-toggle" data-bs-toggle="dropdown">
+                    @if(auth()->user()->photo)
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" class="rounded-circle object-fit-cover" width="35" height="35" alt="Avatar">
+                    @else
+                        <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
+                    @endif
+                    <span class="fw-semibold">{{ auth()->user()->username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 10px;">
+                    <li>
+                        <a class="dropdown-item py-2" href="{{ route('admin.profile.edit') }}">
+                            <i class="bi bi-person-gear me-2 text-primary"></i> Edit Profil
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item py-2 text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
 

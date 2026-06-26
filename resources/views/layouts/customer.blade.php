@@ -200,9 +200,13 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
-                            <span style="width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                                <i class="bi bi-person-fill"></i>
-                            </span>
+                            @if(auth()->user()->photo)
+                                <img src="{{ asset('storage/' . auth()->user()->photo) }}" class="rounded-circle object-fit-cover" width="30" height="30" alt="Avatar">
+                            @else
+                                <span style="width:30px;height:30px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                            @endif
                             {{ auth()->user()->username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
