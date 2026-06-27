@@ -84,6 +84,11 @@
                                     </div>
                                 </div>
                             </div>
+                            @if(!auth()->user()->gender)
+                                <div class="mt-2 text-danger" style="font-size:.8rem; padding-top: 8px; border-top: 1px solid #b8dfc8;">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> Jenis kelamin belum diatur. Silakan <a href="{{ route('customer.profile.edit') }}" class="text-danger fw-bold text-decoration-underline">Update Profil</a> terlebih dahulu agar sistem dapat mencarikan ruangan yang sesuai.
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Form titipan --}}

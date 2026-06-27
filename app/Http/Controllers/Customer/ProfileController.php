@@ -24,7 +24,7 @@ class ProfileController extends Controller
             'email'           => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'no_telepon'      => 'nullable|string|max:20',
             'alamat'          => 'nullable|string|max:500',
-            'gender'          => 'nullable|in:laki-laki,perempuan',
+            'gender'          => 'required|in:laki-laki,perempuan',
             'current_password'=> 'nullable|string',
             'password'        => 'nullable|min:8|confirmed',
             'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

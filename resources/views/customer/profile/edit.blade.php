@@ -42,6 +42,19 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label fw-semibold">Jenis Kelamin</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" id="genderLaki" value="laki-laki" {{ old('gender', $user->gender) === 'laki-laki' ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="genderLaki">Laki-laki</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" id="genderPerempuan" value="perempuan" {{ old('gender', $user->gender) === 'perempuan' ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="genderPerempuan">Perempuan</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-semibold">No. Telepon</label>
                             <input type="text" name="no_telepon" class="form-control" value="{{ old('no_telepon', $user->no_telepon) }}">
                         </div>

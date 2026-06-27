@@ -120,6 +120,10 @@ class BookingController extends Controller
             ? $request->gender_second
             : $customer->gender);
 
+        if (!$genderPasien) {
+            return response()->json(['slots' => [], 'message' => 'Silakan lengkapi Jenis Kelamin di menu Profil terlebih dahulu agar kami dapat menyesuaikan ruangan.']);
+        }
+
         $activeHours = $activeMasterSessions->pluck('jam_mulai')->toArray();
 
         // Ambil semua slot (waktu_boking) untuk tanggal ini yang terdaftar di Master Sesi aktif
@@ -190,6 +194,10 @@ class BookingController extends Controller
         }
 
         $gender = $request->gender ?: auth()->user()->gender;
+
+        if (!$gender) {
+            return response()->json(['ruangan' => []]);
+        }
 
         $isHourActive = \App\Models\MasterSesi::where('jam_mulai', $request->jam)
             ->where('active', true)
