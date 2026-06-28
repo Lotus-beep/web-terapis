@@ -263,20 +263,23 @@
         <!-- Sidebar Actions -->
         <div class="col-lg-5">
             @if($booking->status_service === 'pending')
-            <div class="card mb-4" style="border:2px solid var(--red-main);">
+            <div class="card mb-4" style="border:2px solid var(--green-main);">
                 <div class="card-body text-center p-4">
-                    <i class="bi bi-x-circle" style="font-size:2.5rem;color:var(--red-main);"></i>
-                    <h6 class="fw-bold mt-3 mb-1">Batalkan Booking</h6>
+                    <i class="bi bi-whatsapp" style="font-size:2.5rem;color:#25D366;"></i>
+
+                    <h6 class="fw-bold mt-3 mb-1">Hubungi Admin</h6>
+
                     <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;">
-                        Booking masih bisa dibatalkan selagi masih berstatus Menunggu.
+                        Jika Anda ingin membatalkan atau memiliki pertanyaan mengenai booking,
+                        silakan hubungi admin melalui WhatsApp.
                     </p>
-                    <form method="POST" action="{{ route('customer.bookings.cancel', $booking->id) }}"
-                        onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
-                        @csrf @method('PATCH')
-                        <button type="submit" class="btn btn-danger w-100" style="border-radius:8px;font-weight:700;">
-                            <i class="bi bi-x-circle me-2"></i>Batalkan Booking
-                        </button>
-                    </form>
+
+                    <a href="https://wa.me/6281213691206?text=Halo%20Admin,%20saya%20ingin%20bertanya%20mengenai%20booking%20dengan%20ID%20{{ $booking->id }}."
+                        target="_blank"
+                        class="btn btn-success w-100"
+                        style="border-radius:8px;font-weight:700;">
+                        <i class="bi bi-whatsapp me-2"></i>Hubungi Admin
+                    </a>
                 </div>
             </div>
             @endif

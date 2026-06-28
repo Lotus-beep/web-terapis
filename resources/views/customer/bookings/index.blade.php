@@ -57,12 +57,6 @@
                             <td><span class="badge bg-{{ $pc[$b->status_payment]??'secondary' }}">{{ ucfirst(str_replace('_',' ',$b->status_payment)) }}</span></td>
                             <td>
                                 <a href="{{ route('customer.bookings.show', $b->id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
-                                @if($b->status_service === 'pending')
-                                    <form method="POST" action="{{ route('customer.bookings.cancel', $b->id) }}" class="d-inline" onsubmit="return confirm('Batalkan booking ini?')">
-                                        @csrf @method('PATCH')
-                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i></button>
-                                    </form>
-                                @endif
                             </td>
                         </tr>
                         @empty

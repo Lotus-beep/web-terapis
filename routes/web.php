@@ -44,6 +44,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::patch('bookings/{booking}/confirm-payment', [App\Http\Controllers\Admin\BookingController::class, 'confirmPayment'])->name('bookings.confirm-payment');
     Route::patch('bookings/{booking}/reject-payment', [App\Http\Controllers\Admin\BookingController::class, 'rejectPayment'])->name('bookings.reject-payment');
     Route::patch('bookings/{booking}/assign-terapis', [App\Http\Controllers\Admin\BookingController::class, 'assignTerapis'])->name('bookings.assign-terapis');
+
+    // Kelola transaksi
+    Route::get('transaksi/export', [App\Http\Controllers\Admin\TransaksiController::class, 'export'])
+        ->name('transaksi.export');
+    Route::resource('transaksi', App\Http\Controllers\Admin\TransaksiController::class);
     
     // Lihat Comments
     Route::get('comments', [App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');

@@ -336,6 +336,9 @@
             <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-check"></i> Bookings
             </a>
+            <a href="{{ route('admin.transaksi.index') }}" class="nav-link {{ request()->routeIs('admin.transaksi.*') ? 'active' : '' }}">
+                <i class="bi bi-receipt"></i> Kelola Transaksi
+            </a>
             <a href="{{ route('admin.comments.index') }}" class="nav-link {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                 <i class="bi bi-chat-dots"></i> Comments
             </a>
