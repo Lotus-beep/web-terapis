@@ -29,27 +29,27 @@ class ServiceCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'           => 'required|string|max:100',
-            'category'       => 'required|in:bekam,non-bekam',
+            'name' => 'required|string|max:100',
+            'category' => 'required|in:bekam,non-bekam',
             'header_content' => 'nullable|string|max:200',
-            'description'    => 'nullable|string|max:500',
-            'price'          => 'required|numeric|min:0',
-            'is_active'      => 'nullable|boolean',
-            'sort_order'     => 'nullable|integer|min:0',
-            'images'         => 'nullable|array',
-            'images.*'       => 'image|mimes:jpg,jpeg,png,webp|max:3072',
+            'description' => 'nullable|string|max:500',
+            'price' => 'required|numeric|min:0',
+            'is_active' => 'nullable|boolean',
+            'sort_order' => 'nullable|integer|min:0',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:3072',
         ]);
 
         $service = ServiceCategory::create([
-            'name'           => $request->name,
-            'slug'           => Str::slug($request->name),
-            'category'       => $request->category,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'category' => $request->category,
             'header_content' => $request->header_content,
-            'description'    => $request->description,
-            'price'          => $request->price,
-            'icon'           => 'bi-heart-pulse-fill',
-            'is_active'      => $request->boolean('is_active', true),
-            'sort_order'     => $request->sort_order ?? 0,
+            'description' => $request->description,
+            'price' => $request->price,
+            'icon' => 'bi-heart-pulse-fill',
+            'is_active' => $request->boolean('is_active', true),
+            'sort_order' => $request->sort_order ?? 0,
         ]);
 
         // Simpan multiple images
@@ -58,9 +58,9 @@ class ServiceCategoryController extends Controller
                 $path = $file->store('categories', 'public');
                 ServiceImage::create([
                     'service_category_id' => $service->id,
-                    'path'                => $path,
-                    'sort_order'          => $index,
-                    'is_primary'          => $index === 0,
+                    'path' => $path,
+                    'sort_order' => $index,
+                    'is_primary' => $index === 0,
                 ]);
             }
         }
@@ -78,28 +78,28 @@ class ServiceCategoryController extends Controller
     public function update(Request $request, ServiceCategory $serviceCategory)
     {
         $request->validate([
-            'name'           => 'required|string|max:100',
-            'category'       => 'required|in:bekam,non-bekam',
+            'name' => 'required|string|max:100',
+            'category' => 'required|in:bekam,non-bekam',
             'header_content' => 'nullable|string|max:200',
-            'description'    => 'nullable|string|max:500',
-            'price'          => 'required|numeric|min:0',
-            'is_active'      => 'nullable|boolean',
-            'sort_order'     => 'nullable|integer|min:0',
-            'images'         => 'nullable|array',
-            'images.*'       => 'image|mimes:jpg,jpeg,png,webp|max:3072',
-            'delete_images'  => 'nullable|array',
-            'delete_images.*'=> 'integer|exists:service_images,id',
+            'description' => 'nullable|string|max:500',
+            'price' => 'required|numeric|min:0',
+            'is_active' => 'nullable|boolean',
+            'sort_order' => 'nullable|integer|min:0',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:3072',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'integer|exists:service_images,id',
         ]);
 
         $serviceCategory->update([
-            'name'           => $request->name,
-            'slug'           => Str::slug($request->name),
-            'category'       => $request->category,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'category' => $request->category,
             'header_content' => $request->header_content,
-            'description'    => $request->description,
-            'price'          => $request->price,
-            'is_active'      => $request->boolean('is_active', true),
-            'sort_order'     => $request->sort_order ?? 0,
+            'description' => $request->description,
+            'price' => $request->price,
+            'is_active' => $request->boolean('is_active', true),
+            'sort_order' => $request->sort_order ?? 0,
         ]);
 
         // Hapus gambar yang dipilih untuk dihapus
@@ -107,6 +107,7 @@ class ServiceCategoryController extends Controller
             $toDelete = ServiceImage::whereIn('id', $request->delete_images)
                 ->where('service_category_id', $serviceCategory->id)
                 ->get();
+
             foreach ($toDelete as $img) {
                 Storage::disk('public')->delete($img->path);
                 $img->delete();
@@ -120,9 +121,9 @@ class ServiceCategoryController extends Controller
                 $path = $file->store('categories', 'public');
                 ServiceImage::create([
                     'service_category_id' => $serviceCategory->id,
-                    'path'                => $path,
-                    'sort_order'          => $existingCount + $index,
-                    'is_primary'          => $existingCount === 0 && $index === 0,
+                    'path' => $path,
+                    'sort_order' => $existingCount + $index,
+                    'is_primary' => $existingCount === 0 && $index === 0,
                 ]);
             }
         }
@@ -144,9 +145,11 @@ class ServiceCategoryController extends Controller
     public function destroy(ServiceCategory $serviceCategory)
     {
         if ($serviceCategory->bookings()->count() > 0) {
-            return back()->with('error',
+            return back()->with(
+                'error',
                 'Layanan tidak bisa dihapus karena masih digunakan oleh ' .
-                $serviceCategory->bookings()->count() . ' booking.');
+                $serviceCategory->bookings()->count() . ' booking.'
+            );
         }
 
         // Hapus semua gambar dari storage

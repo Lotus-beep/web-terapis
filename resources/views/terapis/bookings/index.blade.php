@@ -31,6 +31,7 @@
                     @php
                         $sc=['pending'=>'warning','confirmed'=>'info','in_progress'=>'primary','completed'=>'success','cancelled'=>'danger'];
                         $pc=['unpaid'=>'secondary','waiting_confirmation'=>'warning','paid'=>'success','rejected'=>'danger'];
+                        $today=today()->toDateString();
                     @endphp
                     <tr>
                         <td>{{ $loop->iteration }}</td>
@@ -45,6 +46,7 @@
                         <td><span class="badge bg-{{ $sc[$b->status_service]??'secondary' }}">{{ ucfirst(str_replace('_',' ',$b->status_service)) }}</span></td>
                         <td><span class="badge bg-{{ $pc[$b->status_payment]??'secondary' }}">{{ ucfirst(str_replace('_',' ',$b->status_payment)) }}</span></td>
                         <td>
+                           @if($b->date_booking->isToday())
                             @if($b->status_service === 'pending')
                                 <form method="POST" action="{{ route('terapis.bookings.confirm', $b->id) }}" class="d-inline">
                                     @csrf @method('PATCH')
@@ -63,6 +65,7 @@
                                     <button class="btn btn-sm btn-info" title="Selesai"><i class="bi bi-check-circle"></i></button>
                                 </form>
                             @endif
+                           @endif
 
                             @if(in_array($b->status_service, ['in_progress', 'completed']))
                                 <a href="{{ route('terapis.bookings.report', $b->id) }}" class="btn btn-sm btn-secondary" title="Isi Laporan">

@@ -13,12 +13,12 @@
     <tbody>
     @foreach($bookings as $booking)
         <tr>
-            <td>{{ $booking->booking_code }}</td>
-            <td>{{ $booking->user->name }}</td>
+            <td>{{ $booking->id }}</td>
+            <td>{{ $booking->customer->username }}</td>
             <td>{{ $booking->service->name }}</td>
-            <td>{{ $booking->therapist->name }}</td>
-            <td>{{ $booking->status }}</td>
-            <td>{{ $booking->booking_date }}</td>
+            <td>{{ $booking->terapis->usernames }}</td>
+            <td>{{ $booking->status_payment }}</td>
+            <td>{{ $booking->date_booking }}</td>
         </tr>
     @endforeach
     </tbody>

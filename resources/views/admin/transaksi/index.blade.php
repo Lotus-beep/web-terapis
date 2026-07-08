@@ -23,6 +23,13 @@
                 </select>
             </div>
             <div class="col-auto"><button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-filter"></i> Filter</button></div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.transaksi.export', request()->query()) }}"
+                    class="btn btn-success">
+                    <i class="bi bi-file-earmark-excel"></i>
+                    Export Excel
+                </a>
+            </div>
         </form>
     </div>
     <div class="card-body p-0">
@@ -53,11 +60,6 @@
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                             </form>
-                            <a href="{{ route('admin.transaksi.export', request()->query()) }}"
-                            class="btn btn-success">
-                                <i class="bi bi-file-earmark-excel"></i>
-                                Export Excel
-                            </a>
                         </td>
                     </tr>
                     @empty

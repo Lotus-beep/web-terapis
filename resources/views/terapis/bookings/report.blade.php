@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Suhu Tubuh (contoh: 36.5 °C)</label>
-                    <input type="text" name="suhu_tubuh" class="form-control" value="{{ old('suhu_tubuh', $booking->therapyReport->suhu_tubuh ?? '') }}">
+                    <input type="text" name="suhu_tubuh" class="form-control" value="{{ old('suhu_tubuh', $booking->therapyReport->suhu_tubuh ?? '') }}" required autofocus>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Kondisi Umum (contoh: Stabil, Lemah)</label>

@@ -2,6 +2,12 @@
 @section('title','Detail Booking')
 @section('content')
 
+@php
+    $clinicName = \App\Models\ClinicSetting::getValue('clinic_name', 'Klinik Bekam');
+    $clinicPhone = \App\Models\ClinicSetting::getValue('clinic_phone', '-');
+    $clinicHours = \App\Models\ClinicSetting::getValue('clinic_hours', '-');
+@endphp
+
 <div class="py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Detail Booking #{{ $booking->id }}</h4>
@@ -274,7 +280,7 @@
                         silakan hubungi admin melalui WhatsApp.
                     </p>
 
-                    <a href="https://wa.me/6281213691206?text=Halo%20Admin,%20saya%20ingin%20bertanya%20mengenai%20booking%20dengan%20ID%20{{ $booking->id }}."
+                    <a href="https://wa.me/{{ $clinicHours }}?text=Halo%20Admin,%20saya%20ingin%20bertanya%20mengenai%20booking%20dengan%20ID%20{{ $booking->id }}"
                         target="_blank"
                         class="btn btn-success w-100"
                         style="border-radius:8px;font-weight:700;">
